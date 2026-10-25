@@ -37,7 +37,7 @@ Required server variables are `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DIS
 Registered Discord OAuth redirects:
 
 - `http://127.0.0.1:5174/api/auth/discord/callback/`
-- `https://sko-designs.gilles-vangroenderbe.chatgpt.site/api/auth/discord/callback/`
+- `https://www.skodesign.nl/api/auth/discord/callback/` (production; set this as `DISCORD_REDIRECT_URI` in the Sites runtime)
 
 The protected page is `/nl/admin/` (or `/en/admin/`, `/fr/admin/`). All write endpoints verify the session, staff role and same-origin request before changing data. Local D1/R2 data is separate from the hosted data; local test content is never copied to production.
 
