@@ -3,8 +3,24 @@ async function handle(request: Request) {
   const backend=process.env.SKO_BACKEND_URL, token=process.env.SKO_BACKEND_TOKEN, secret=process.env.SKO_PUBLIC_PROXY_SECRET;
   if(!backend||!token||!secret)return new Response("Hosting configuration is incomplete.",{status:503,headers:{"Cache-Control":"no-store"}});
   const incoming=new URL(request.url);
+  let backendUrl: URL;
+  try {
+    backendUrl = new URL(backend);
+  } catch {
+    return new Response("SKO_BACKEND_URL must be a valid private Sites URL.",{status:503,headers:{"Cache-Control":"no-store"}});
+  }
+  // Never let this proxy call its own Vercel deployment; that creates nested
+  // function invocations until Vercel returns 508 INFINITE_LOOP_DETECTED.
+  if (
+    backendUrl.origin === incoming.origin ||
+    ["skodesign.nl", "www.skodesign.nl"].includes(backendUrl.hostname) ||
+    backendUrl.hostname.endsWith(".vercel.app")
+  ) {
+    console.error("SKO_BACKEND_URL points back to the public Vercel site.");
+    return new Response("Proxy loop prevented. Set SKO_BACKEND_URL to the private Sites origin, not skodesign.nl or a Vercel URL.",{status:503,headers:{"Cache-Control":"no-store"}});
+  }
   const path=incoming.searchParams.get("path") || "";
-  const upstream=new URL("/"+path.replace(/^\/+/,""),backend);
+  const upstream=new URL("/"+path.replace(/^\/+/,""),backendUrl);
   for(const [key,value]of incoming.searchParams)if(key!=="path")upstream.searchParams.append(key,value);
   const headers=new Headers(request.headers);
   for(const name of ["host","connection","content-length","transfer-encoding","authorization","oai-authenticated-user-id","oai-authenticated-user-email","x-sko-forwarded-origin","x-sko-proxy-secret","x-sko-client-ip"])headers.delete(name);
@@ -21,7 +37,7 @@ async function handle(request: Request) {
     const resultHeaders=new Headers(response.headers);
     resultHeaders.delete("Content-Encoding");resultHeaders.delete("Content-Length");
     const location=resultHeaders.get("Location");
-    if(location){const destination=new URL(location,backend);if(destination.origin===new URL(backend).origin){destination.protocol=incoming.protocol;destination.host=incoming.host;resultHeaders.set("Location",destination.href);}}
+    if(location){const destination=new URL(location,backendUrl);if(destination.origin===backendUrl.origin){destination.protocol=incoming.protocol;destination.host=incoming.host;resultHeaders.set("Location",destination.href);}}
     if(!upstream.pathname.startsWith("/assets/")&&!upstream.pathname.startsWith("/_next/"))resultHeaders.set("Cache-Control","private, no-store");
     let responseBody:BodyInit|null=request.method==="HEAD"?null:response.body;
     if(responseBody&&resultHeaders.get("Content-Type")?.includes("text/html")){
