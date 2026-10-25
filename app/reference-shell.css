@@ -244,7 +244,7 @@ html[data-theme="dark"] .modal-art {
 .page-home .project-image {
   aspect-ratio: 16/10;
   padding: 0;
-  background: #10101a;
+  background: transparent;
 }
 .page-home .project-image img {
   object-fit: contain;
@@ -261,8 +261,8 @@ html[data-theme="dark"] .modal-art {
 }
 .page-home .project-preview {
   border-radius: 12px;
-  border: 1px solid var(--line);
-  box-shadow: 0 8px 24px #243f6a08;
+  border: 1px solid transparent;
+  box-shadow: none;
 }
 .page-heading {
   padding-top: 65px;
@@ -769,3 +769,5 @@ html[data-theme="dark"]
   ) {
   color: #91adff;
 }
+
+.project-preview, .project-preview .project-image, .page-home .project-preview .project-image, dialog .modal-art, html[data-theme='dark'] dialog .modal-art { background: transparent; }
