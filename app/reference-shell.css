@@ -9,6 +9,14 @@
 body {
   background: var(--page);
 }
+.project-image,
+.page-home .project-image,
+html[data-theme="dark"] .project-image,
+.modal-art,
+html[data-theme="dark"] .modal-art {
+  background: transparent;
+  border-color: transparent;
+}
 .site-header {
   width: min(1460px, calc(100% - 36px));
   height: 64px;
