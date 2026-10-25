@@ -32,12 +32,12 @@ Open the Local URL printed by the server. Build with `npm run build`. The Sites 
 
 The configured server is `1562896437082071090`, the staff role is `1563635614287663185` and the Discord application is `1564008974720958464`. The application requests only `identify` and `guilds.members.read`; no bot token is needed.
 
-Required server variables are `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_GUILD_ID`, `DISCORD_STAFF_ROLE_ID` and `DISCORD_REDIRECT_URI`. Runtime secrets are stored in Sites. Local values use an ignored `.dev.vars` file; never commit that file. Restart the development server after changing local runtime variables.
+Required server variables are `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_GUILD_ID` and `DISCORD_STAFF_ROLE_ID`. Runtime secrets are stored in Sites. Local values use an ignored `.dev.vars` file; never commit that file. Restart the development server after changing local runtime variables.
 
-Registered Discord OAuth redirects:
+Required Discord OAuth redirects to register in the application settings:
 
 - `http://127.0.0.1:5174/api/auth/discord/callback/`
-- `https://www.skodesign.nl/api/auth/discord/callback/` (production; set this as `DISCORD_REDIRECT_URI` in the Sites runtime)
+- `https://www.skodesign.nl/api/auth/discord/callback/` (production; exact match, including the trailing slash)
 
 The protected page is `/nl/admin/` (or `/en/admin/`, `/fr/admin/`). All write endpoints verify the session, staff role and same-origin request before changing data. Local D1/R2 data is separate from the hosted data; local test content is never copied to production.
 

@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { canonicalOrigin } from "./content";
 
 export const staffConfig = () => ({
   clientId: env.DISCORD_CLIENT_ID || "",
@@ -95,13 +96,9 @@ async function decryptToken(cipher: string) {
 }
 export function redirectUri(r: Request) {
   const origin=publicOrigin(r);
-  // Keep production Discord OAuth on the public canonical domain, never the private Site origin.
-  if(origin==="https://www.skodesign.nl"||origin==="https://skodesign.nl")return "https://www.skodesign.nl/api/auth/discord/callback/";
+  // Discord OAuth must always return to the public canonical site, never its private Site origin.
   if(origin==="http://127.0.0.1:5174")return origin+"/api/auth/discord/callback/";
-  return (
-    env.DISCORD_REDIRECT_URI ||
-    new URL("/api/auth/discord/callback/", r.url).href
-  );
+  return `${canonicalOrigin}/api/auth/discord/callback/`;
 }
 export async function discordRequest(path: string, token: string) {
   return fetch("https://discord.com/api/v10" + path, {
