@@ -4,6 +4,8 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist/client",
   "functions": {"api/site.ts": {"maxDuration": 60}},
-  "redirects": [{"source":"/:path*","has":[{"type":"host","value":"www.skodesign.nl"}],"destination":"https://skodesign.nl/:path*","permanent":true}],
-  "rewrites": [{"source":"/:path*","destination":"/api/site?path=:path*"}]
+  "rewrites": [
+    {"source":"/","destination":"/api/site?path="},
+    {"source":"/:path*","destination":"/api/site?path=:path*"}
+  ]
 }

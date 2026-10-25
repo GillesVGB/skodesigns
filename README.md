@@ -53,7 +53,7 @@ Ordering is through the latest user-confirmed Discord invitation: https://discor
 
 ## Domain and deployment
 
-The requested domain is `https://skodesign.nl`. Canonical URLs, sitemap and hreflang use that domain. The custom-domain entry has been prepared in Sites and remains pending until its A and verification TXT records are configured with the domain provider. The existing thomdesigns.nl host and DNS have not been changed.
+The production domain is `https://www.skodesign.nl`; the Vercel project should use `www` as its primary domain and redirect the apex domain to it. Vercel rewrites the homepage and other requests to the proxy in `api/site.ts`. The Vercel project must deploy this repository's `main` branch and have `SKO_BACKEND_URL`, `SKO_BACKEND_TOKEN` and `SKO_PUBLIC_PROXY_SECRET` configured. The existing thomdesigns.nl host and DNS have not been changed.
 
 The Sites preview keeps its existing owner-private audience. Source is also pushed to the user-requested GitHub repository `https://github.com/GillesVGB/skodesigns`.
 

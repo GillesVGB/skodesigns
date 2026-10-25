@@ -15,7 +15,7 @@ export const pages = [
 ] as const;
 export type Page = (typeof pages)[number];
 export const discord = "https://discord.gg/skodesigns";
-export const canonicalOrigin = "https://skodesign.nl";
+export const canonicalOrigin = "https://www.skodesign.nl";
 export const languageNames = {
   nl: "Nederlands",
   en: "English",
