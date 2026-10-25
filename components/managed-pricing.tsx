@@ -146,7 +146,8 @@ function Builder({
 }) {
   const [chosen, setChosen] = useState<string[]>([]),
     [box, setBox] = useState<string | null>(null),
-    [copyState, setCopyState] = useState("");
+    [copyState, setCopyState] = useState(""),
+    [expanded, setExpanded] = useState(true);
   const selected = [
     ...singles.filter((item) => chosen.includes(item.id)),
     ...boxes.filter((item) => item.id === box),
@@ -165,11 +166,44 @@ function Builder({
     }
   }
   return (
-    <section className="package-builder" aria-labelledby="builder-title">
-      <div>
-        <p className="eyebrow">SKO / {d.pricing.selection}</p>
-        <h2 id="builder-title">{d.pricing.builder}</h2>
-        <p>{d.pricing.builderDesc}</p>
+    <details
+      className="pricing-builder"
+      aria-labelledby="builder-title"
+      open={expanded}
+      onToggle={(event) => {
+        if (event.currentTarget.open !== expanded)
+          setExpanded(event.currentTarget.open);
+      }}
+    >
+      <summary
+        className="pricing-builder-toggle"
+        aria-controls="builder-content"
+        aria-expanded={expanded}
+      >
+        <span className="pricing-builder-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="4.5" y="3" width="15" height="18" rx="2.5" />
+            <path d="M8 7h8M8 11h1m3 0h1m3 0h1M8 15h1m3 0h1m3 0h1M8 18h1m3 0h1" />
+          </svg>
+        </span>
+        <span className="pricing-builder-heading">
+          <span className="pricing-builder-title" id="builder-title" role="heading" aria-level={2}>
+            {d.pricing.builder}
+          </span>
+          <span className="pricing-builder-description">{d.pricing.builderDesc}</span>
+        </span>
+        <span className="pricing-builder-meta">
+          <span className="pricing-builder-quick-total">
+            {d.pricing.total}: {money(total, lang)}
+          </span>
+          <svg className="pricing-builder-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </span>
+      </summary>
+      <div className="pricing-builder-content" id="builder-content">
+        <div className="pricing-builder-options">
+          <p className="eyebrow">SKO / {d.pricing.selection}</p>
         {singles.length > 0 && (
           <fieldset>
             <legend>{d.pricing.singles}</legend>
@@ -212,7 +246,7 @@ function Builder({
             ))}
           </fieldset>
         )}
-      </div>
+        </div>
       <div className="builder-summary">
         <div className="builder-summary-top">
           <span className="eyebrow">{d.pricing.selection}</span>
@@ -257,6 +291,7 @@ function Builder({
         </a>
         <small>{d.pricing.builderNote}</small>
       </div>
-    </section>
+      </div>
+    </details>
   );
 }
