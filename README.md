@@ -4,7 +4,7 @@ A multilingual creative-studio website built with Next.js, React and TypeScript.
 
 ## Run locally
 
-Requires Node.js 22.13 or later. Create `.env.local` from `.env.example` and add the Postgres, Blob and Discord credentials before testing the API locally.
+Requires Node.js 22.13 or later. Create `.env.local` from `.env.example` and add the Supabase and Discord credentials before testing the API locally.
 
 ```sh
 npm ci
@@ -26,14 +26,14 @@ Open `http://127.0.0.1:5174`. Build with `npm run build`.
 - `components/admin.tsx`: Discord staff login and management of recent work, the existing pricing page and reviews. There is no separate store page: pricing is the store.
 - `lib/pricing-catalog.ts`: the original price list; database overrides and new items feed the pricing page, package calculator and project planner together.
 - `lib/staff-auth.ts`: authorization-code OAuth with state validation, encrypted access tokens, opaque HttpOnly session cookies and server-side membership checks. Sessions expire within one hour; positive role checks are reused for at most ten seconds to avoid Discord rate limits. Removing a staff role therefore takes effect within ten seconds. API failures deny access.
-- `lib/platform.ts`: Postgres-backed persistence and private Vercel Blob storage for staff uploads. The first API request creates the required tables and indexes if the database is empty.
+- `lib/platform.ts`: Supabase Postgres persistence and private Supabase Storage for staff uploads. The first API request creates the required tables and indexes if the database is empty; the first upload creates the private `sko-designs-media` bucket if needed.
 - Staff uploads have an 8 MB limit and validated PNG/JPEG/static WebP headers and bounded image dimensions. Deleting portfolio and price items unpublishes them, with an immediate Undo action. Deleting a review permanently removes that record after an explicit confirmation in the UI.
 
 ## Discord staff access
 
 The configured server is `1562896437082071090`, the staff role is `1563635614287663185` and the Discord application is `1564008974720958464`. The application requests only `identify` and `guilds.members.read`; no bot token is needed.
 
-Required database variables are `SUPABASE_DATABASE_URL` (recommended for Supabase), `DATABASE_URL` or the Vercel integration's `POSTGRES_URL`. For this project's `postgres` driver, use Supabase's Shared Pooler in Session mode (port 5432); Supabase documents a query-pipelining incompatibility between this driver and Transaction mode. TLS is required and prepared statements are disabled. `SUPABASE_DATABASE_URL` takes precedence, leaving provider-managed Vercel URLs available as a rollback. Discord also requires `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET`. Connect a private Blob store to the same Vercel project; new OIDC-backed stores provide `BLOB_STORE_ID` and short-lived authentication automatically, while token-based stores use `BLOB_READ_WRITE_TOKEN`. The guild and staff role IDs default to the values above, but may be overridden with `DISCORD_GUILD_ID` and `DISCORD_STAFF_ROLE_ID`. Add all required variables to Production (and Preview if you use previews), then redeploy so the new environment is applied. For local development, store them in the ignored `.env.local` file. Never commit secrets.
+The application uses Supabase for all user-managed content: reviews, portfolio metadata, pricing, and uploaded image files. Set `SUPABASE_URL`, `SUPABASE_DATABASE_URL`, and the server-only `SUPABASE_SECRET_KEY`; the secret key must never use a `NEXT_PUBLIC_` prefix. For this project's `postgres` driver, use Supabase's Shared Pooler in Session mode (port 5432); TLS is required and prepared statements are disabled. Uploads use a private Supabase Storage bucket, created automatically on the first staff upload. Vercel only hosts the application; it does not need a database integration or Blob store. Discord also requires `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET`. The guild and staff role IDs default to the values above, but may be overridden with `DISCORD_GUILD_ID` and `DISCORD_STAFF_ROLE_ID`. Add all required variables to Production (and Preview if you use previews), then redeploy so the new environment is applied. For local development, store them in the ignored `.env.local` file. Never commit secrets.
 
 Required Discord OAuth redirects to register in the application settings:
 
@@ -54,7 +54,7 @@ Ordering is through the latest user-confirmed Discord invitation: https://discor
 
 ## Domain and deployment
 
-The production domain is `https://www.skodesign.nl`; the Vercel project should use `www` as its primary domain and redirect the apex domain to it. The app and its `/api/*` routes deploy together from this repository's `main` branch. No catch-all proxy, second host or subdomain is required. Connect a Postgres database and a private Blob store to Vercel, then add the variables listed above. Register `https://www.skodesign.nl/api/auth/discord/callback/` as the production OAuth redirect URI in Discord.
+The production domain is `https://www.skodesign.nl`; the Vercel project should use `www` as its primary domain and redirect the apex domain to it. The app and its `/api/*` routes deploy together from this repository's `main` branch. No catch-all proxy, second host or subdomain is required. Add the Supabase and Discord variables listed above to Vercel. Register `https://www.skodesign.nl/api/auth/discord/callback/` as the production OAuth redirect URI in Discord. Existing images previously uploaded to Vercel Blob are not copied automatically; upload those again through the staff page after deploying this Supabase Storage version.
 
 Source is also pushed to the user-requested GitHub repository `https://github.com/GillesVGB/skodesigns`.
 

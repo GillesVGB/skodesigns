@@ -1,4 +1,3 @@
-import { get, head, put } from "@vercel/blob";
 import { Buffer } from "node:buffer";
 import postgres from "postgres";
 
@@ -24,12 +23,7 @@ let client: ReturnType<typeof postgres> | undefined;
 let schemaReady: Promise<void> | undefined;
 
 function getClient() {
-  // Keep a dedicated Supabase variable ahead of provider-managed URLs so a
-  // Vercel Postgres integration can remain available as a rollback target.
-  const url =
-    process.env.SUPABASE_DATABASE_URL ||
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL;
+  const url = process.env.SUPABASE_DATABASE_URL;
   if (!url) return undefined;
   if (!client) {
     client = postgres(url, {
@@ -114,7 +108,7 @@ async function runQuery(
   const db = getClient();
   if (!db)
     throw new Error(
-      "SUPABASE_DATABASE_URL, DATABASE_URL or POSTGRES_URL is not configured.",
+      "SUPABASE_DATABASE_URL is not configured.",
     );
   await ensureSchema(db);
   return statement.execute(run);
@@ -128,7 +122,7 @@ const database = {
     const db = getClient();
     if (!db)
       throw new Error(
-        "SUPABASE_DATABASE_URL, DATABASE_URL or POSTGRES_URL is not configured.",
+        "SUPABASE_DATABASE_URL is not configured.",
       );
     await ensureSchema(db);
     return db.begin(async (tx) => {
@@ -145,48 +139,127 @@ const database = {
 };
 
 const bucket = {
-  async put(key: string, body: Uint8Array, options: { httpMetadata?: { contentType?: string } }) {
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
-    return put(key, Buffer.from(body), {
-      access: "private",
-      addRandomSuffix: false,
-      contentType: options.httpMetadata?.contentType,
-      ...(token ? { token } : {}),
-    });
+  async put(
+    key: string,
+    body: Uint8Array,
+    options: { httpMetadata?: { contentType?: string } },
+  ) {
+    await ensureSupabaseBucket();
+    const response = await supabaseStorageRequest(
+      `/object/${encodeURIComponent(storageBucketName())}/${encodeURIComponent(key)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": options.httpMetadata?.contentType || "application/octet-stream",
+          "Cache-Control": "max-age=3600",
+        },
+        body: Buffer.from(body),
+      },
+    );
+    if (!response.ok)
+      throw new Error(`Supabase Storage upload failed (${response.status}).`);
   },
   async head(key: string) {
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token && !process.env.BLOB_STORE_ID) return null;
-    try {
-      return await head(key, token ? { token } : {});
-    } catch {
-      return null;
-    }
+    const response = await supabaseStorageRequest(
+      `/object/${encodeURIComponent(storageBucketName())}/${encodeURIComponent(key)}`,
+      { method: "HEAD" },
+    );
+    if (response.status === 404) return null;
+    if (!response.ok)
+      throw new Error(`Supabase Storage check failed (${response.status}).`);
+    return { httpMetadata: { contentType: response.headers.get("content-type") || undefined } };
   },
   async get(key: string) {
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token && !process.env.BLOB_STORE_ID) return null;
-    const blob = await get(key, {
-      access: "private",
-      ...(token ? { token } : {}),
-    });
-    return blob && blob.statusCode === 200
+    const response = await supabaseStorageRequest(
+      `/object/authenticated/${encodeURIComponent(storageBucketName())}/${encodeURIComponent(key)}`,
+    );
+    if (response.status === 404) return null;
+    if (!response.ok)
+      throw new Error(`Supabase Storage download failed (${response.status}).`);
+    return response.body
       ? {
-          body: blob.stream,
-          httpMetadata: { contentType: blob.blob.contentType },
+          body: response.body,
+          httpMetadata: { contentType: response.headers.get("content-type") || undefined },
         }
       : null;
   },
 };
+
+function supabaseStorageConfig() {
+  const url = process.env.SUPABASE_URL?.replace(/\/+$/, "");
+  const key = process.env.SUPABASE_SECRET_KEY;
+  if (!url || !key) return undefined;
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return undefined;
+  }
+  if (
+    parsed.protocol !== "https:" &&
+    !(parsed.protocol === "http:" && parsed.hostname === "localhost")
+  )
+    return undefined;
+  return { url: parsed.origin, key };
+}
+
+function storageBucketName() {
+  return process.env.SUPABASE_STORAGE_BUCKET || "sko-designs-media";
+}
+
+async function supabaseStorageRequest(path: string, init: RequestInit = {}) {
+  const config = supabaseStorageConfig();
+  if (!config) throw new Error("Supabase Storage is not configured.");
+  const headers = new Headers(init.headers);
+  headers.set("apikey", config.key);
+  return fetch(`${config.url}/storage/v1${path}`, {
+    ...init,
+    headers,
+    cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
+  });
+}
+
+let bucketSetup: Promise<void> | undefined;
+async function ensureSupabaseBucket() {
+  if (!bucketSetup) {
+    bucketSetup = (async () => {
+      const name = storageBucketName();
+      if (!/^[a-z0-9][a-z0-9-]{1,62}$/.test(name))
+        throw new Error("SUPABASE_STORAGE_BUCKET has an invalid name.");
+      const existing = await supabaseStorageRequest(
+        `/bucket/${encodeURIComponent(name)}`,
+      );
+      if (existing.ok) return;
+      if (existing.status !== 404)
+        throw new Error(`Supabase Storage bucket check failed (${existing.status}).`);
+      const created = await supabaseStorageRequest("/bucket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: name,
+          name,
+          public: false,
+          file_size_limit: 8_000_000,
+          allowed_mime_types: ["image/png", "image/jpeg", "image/webp"],
+        }),
+      });
+      if (!created.ok && created.status !== 409)
+        throw new Error(`Supabase Storage bucket creation failed (${created.status}).`);
+    })().catch((error) => {
+      bucketSetup = undefined;
+      throw error;
+    });
+  }
+  await bucketSetup;
+}
 
 export const env = {
   get DB() {
     return getClient() ? database : undefined;
   },
   get BUCKET() {
-    return process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID
-      ? bucket
-      : undefined;
+    return supabaseStorageConfig() ? bucket : undefined;
   },
   get DISCORD_CLIENT_ID() {
     return process.env.DISCORD_CLIENT_ID;
@@ -206,7 +279,7 @@ export function getDb() {
   const db = getClient();
   if (!db)
     throw new Error(
-      "Set SUPABASE_DATABASE_URL, DATABASE_URL or POSTGRES_URL to connect the database.",
+      "Set SUPABASE_DATABASE_URL to connect the database.",
     );
   return db;
 }
