@@ -23,7 +23,15 @@ async function handle(request: Request) {
     const location=resultHeaders.get("Location");
     if(location){const destination=new URL(location,backend);if(destination.origin===new URL(backend).origin){destination.protocol=incoming.protocol;destination.host=incoming.host;resultHeaders.set("Location",destination.href);}}
     if(!upstream.pathname.startsWith("/assets/")&&!upstream.pathname.startsWith("/_next/"))resultHeaders.set("Cache-Control","private, no-store");
-    return new Response(request.method==="HEAD"?null:response.body,{status:response.status,headers:resultHeaders});
+    let responseBody:BodyInit|null=request.method==="HEAD"?null:response.body;
+    if(responseBody&&resultHeaders.get("Content-Type")?.includes("text/html")){
+      const html=await response.text();
+      const transparentArtwork="<style>.project-preview,.project-preview .project-image,.project-preview .project-image img,.project-modal .modal-art{background-color:transparent!important}.project-preview{border-color:transparent!important}</style>";
+      responseBody=html.replace(/<\/head\s*>/i,`${transparentArtwork}</head>`);
+      resultHeaders.delete("ETag");
+      resultHeaders.delete("Content-MD5");
+    }
+    return new Response(responseBody,{status:response.status,headers:resultHeaders});
   }catch{return new Response("The website is temporarily unavailable. Please try again.",{status:502,headers:{"Cache-Control":"no-store"}});}
 }
 export default {fetch:handle};
