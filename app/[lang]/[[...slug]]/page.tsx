@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Studio from "@/components/studio";
+import { readCatalog, readPricing } from "@/lib/catalog-server";
 import {
   canonicalOrigin,
   dictionaries,
@@ -29,6 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${title} | Sko Designs`,
     description,
     metadataBase: new URL(canonicalOrigin),
+    robots: page === "admin" ? { index: false, follow: false } : undefined,
     alternates: {
       canonical: route(lang, page),
       languages: {
@@ -68,5 +70,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 export default async function Page({ params }: Props) {
   const { lang, page } = await resolve(params);
-  return <Studio lang={lang} page={page} />;
+  const catalog =
+    page === "home" || page === "portfolio" ? await readCatalog() : undefined;
+  const pricing =
+    page === "pricing" || page === "planner" ? await readPricing() : undefined;
+  return <Studio lang={lang} page={page} catalog={catalog} pricing={pricing} />;
 }

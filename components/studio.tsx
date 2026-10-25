@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import DeviceMockups from "./device-mockups";
+import ProjectPlanner from "./project-planner";
+import Admin from "./admin";
+import ManagedPricing from "./managed-pricing";
+import { basePricing, type PricingItem } from "@/lib/pricing-catalog";
 import PublicReviews from "./public-reviews";
 import {
   ReferenceAbout,
@@ -9,17 +12,13 @@ import {
   ReferenceContact,
 } from "./reference-sections";
 import {
-  boxCounts,
-  boxPrices,
   dictionaries,
   discord,
   languageNames,
   languages,
   money,
-  packagePrices,
   projects,
   route,
-  singlePrices,
   type Dictionary,
   type Language,
   type Page,
@@ -67,6 +66,7 @@ function Logo({ d }: { d: Dictionary }) {
         height="755"
         alt={d.ui.logoAlt}
       />
+      <span className="wordmark-contrast" aria-hidden="true" />
       <img
         className="compact-mark"
         src="/assets/sko-icon.webp"
@@ -243,10 +243,11 @@ function Navigation({
     "portfolio",
     "services",
     "pricing",
+    "planner",
     "about",
     "reviews",
   ];
-  const primaryLinks: Page[] = ["home", "portfolio", "pricing"];
+  const primaryLinks: Page[] = ["home", "portfolio", "pricing", "planner"];
   return (
     <>
       <a href="#main" className="skip-link">
@@ -368,8 +369,7 @@ function Intro({
         {title}
         {accent && (
           <>
-            <br />
-            <span className="blue">{accent}</span>
+            <br /> <span className="blue">{accent}</span>
           </>
         )}
       </h2>
@@ -396,8 +396,7 @@ function PageHeading({
         {title}
         {accent && (
           <>
-            <br />
-            <span className="blue">{accent}</span>
+            <br /> <span className="blue">{accent}</span>
           </>
         )}
       </h1>
@@ -432,8 +431,7 @@ function Hero({ lang, d }: { lang: Language; d: Dictionary }) {
           {d.hero.eyebrow}
         </p>
         <h1>
-          {d.hero.line1}
-          <span>{d.hero.accent}</span>
+          {d.hero.line1} <span>{d.hero.accent}</span>
         </h1>
         <p className="hero-description">{d.hero.description}</p>
         <div className="hero-buttons">
@@ -447,10 +445,51 @@ function Hero({ lang, d }: { lang: Language; d: Dictionary }) {
             {d.ui.contact}
             <Arrow diagonal />
           </a>
+          <a
+            className="text-link hero-planner-link"
+            href={route(lang, "planner")}
+          >
+            {d.nav.planner}
+            <Arrow diagonal />
+          </a>
         </div>
       </div>
-      <div className="hero-visual">
-        <DeviceMockups label={d.hero.devices} />
+      <div className="hero-composition">
+        <div className="art-grid" aria-hidden="true" />
+        <span className="composition-cross" aria-hidden="true">
+          +
+        </span>
+        <span className="composition-label">SKO / {d.band[1]}</span>
+        <div className="hero-square">
+          <img
+            src="/assets/sko-icon.webp"
+            width="640"
+            height="640"
+            alt={d.ui.logoAlt}
+            fetchPriority="high"
+          />
+          <span className="square-caption">Sko Designs / 01</span>
+        </div>
+        <div className="hero-banner">
+          <img
+            src="/assets/sko-banner.webp"
+            width="1983"
+            height="793"
+            alt={d.ui.logoAlt}
+            fetchPriority="high"
+          />
+        </div>
+        <div className="hero-thumbnail">
+          <img
+            src="/assets/your-vision.webp"
+            width="1024"
+            height="536"
+            alt="Your Vision, Our Design"
+          />
+        </div>
+        <div className="composition-stamp" aria-hidden="true">
+          <Star />
+        </div>
       </div>
     </section>
   );
@@ -487,7 +526,11 @@ function ProjectImage({
   return (
     <img
       className={className}
-      src={"/assets/" + project.image}
+      src={
+        project.image.startsWith("/")
+          ? project.image
+          : "/assets/" + project.image
+      }
       alt={`${project.title} — ${d.work.filters[project.category as keyof typeof d.work.filters]}. ${d.ui.artAlt}`}
       width={project.width}
       height={project.height}
@@ -501,10 +544,12 @@ function Portfolio({
   lang,
   d,
   full = false,
+  catalog = projects,
 }: {
   lang: Language;
   d: Dictionary;
   full?: boolean;
+  catalog?: Project[];
 }) {
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState<Project | null>(null);
@@ -521,7 +566,7 @@ function Portfolio({
     window.addEventListener("popstate", pop);
     return () => window.removeEventListener("popstate", pop);
   }, [d]);
-  const items = full ? projects : projects.filter((p) => p.featured);
+  const items = full ? catalog : catalog.filter((p) => p.featured).slice(0, 6);
   const visible = items.filter(
     (p) => filter === "all" || p.category === filter,
   );
@@ -584,7 +629,7 @@ function Portfolio({
         <div className="filters" role="group" aria-label={d.nav.portfolio}>
           {Object.entries(d.work.filters)
             .filter(
-              ([k]) => k === "all" || projects.some((p) => p.category === k),
+              ([k]) => k === "all" || catalog.some((p) => p.category === k),
             )
             .map(([k, v]) => (
               <button
@@ -948,253 +993,6 @@ function Reviews({
   return <PublicReviews lang={lang} full={full} />;
 }
 
-function Pricing({
-  lang,
-  d,
-  full = false,
-}: {
-  lang: Language;
-  d: Dictionary;
-  full?: boolean;
-}) {
-  return (
-    <section className="pricing-section section-space container">
-      {full && <h2 className="sr-only">{d.nav.pricing}</h2>}
-      {!full && (
-        <div className="section-head">
-          <Intro
-            eyebrow={d.pricing.eyebrow}
-            title={d.pricing.title}
-            accent={d.pricing.accent}
-            description={d.pricing.description}
-          />
-          <a className="text-link" href={route(lang, "pricing")}>
-            {d.nav.pricing}
-            <Arrow diagonal />
-          </a>
-        </div>
-      )}
-      <div className="package-grid">
-        {d.pricing.packages.map((entry, i) => {
-          const [name, description, features] = entry as [
-            string,
-            string,
-            string[],
-          ];
-          return (
-            <article
-              className={`package ${i === 1 ? "package-featured" : ""}`}
-              key={name}
-            >
-              <div className="package-heading">
-                <span className="eyebrow">0{i + 1}</span>
-                {i === 1 && (
-                  <span className="popular">{d.pricing.popular}</span>
-                )}
-              </div>
-              <h3>{name}</h3>
-              <p>{description}</p>
-              <div className="package-price">
-                <small>{d.ui.from}</small>
-                <strong>{money(packagePrices[i], lang)}</strong>
-              </div>
-              <ul>
-                {features.map((f) => (
-                  <li key={f}>
-                    <span aria-hidden="true">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={discord}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`button ${i === 1 ? "button-white" : "button-outline"}`}
-                aria-label={`${d.ui.order}: ${name} (${d.ui.newTab})`}
-              >
-                {d.ui.order}
-                <Arrow diagonal />
-              </a>
-            </article>
-          );
-        })}
-      </div>
-      <p className="price-condition">{d.pricing.condition}</p>
-      {full && (
-        <>
-          <div className="price-tables">
-            <div>
-              <h2>{d.pricing.singles}</h2>
-              {d.pricing.singleNames.map((name, i) => (
-                <div className="price-row" key={name}>
-                  <span>{name}</span>
-                  <strong>{money(singlePrices[i], lang)}</strong>
-                </div>
-              ))}
-            </div>
-            <div>
-              <h2>{d.pricing.boxes}</h2>
-              {boxCounts.map((n, i) => (
-                <div className="price-row" key={n}>
-                  <span>
-                    {n} {n === 1 ? d.pricing.boxUnit : d.pricing.boxUnits}
-                  </span>
-                  <strong>{money(boxPrices[i], lang)}</strong>
-                </div>
-              ))}
-            </div>
-          </div>
-          <PackageBuilder lang={lang} d={d} />
-          <div className="custom-quote">
-            <div>
-              <h3>{d.pricing.custom}</h3>
-              <p>{d.pricing.customDesc}</p>
-            </div>
-            <a href={route(lang, "contact")} className="text-link">
-              {d.ui.quote}
-              <Arrow diagonal />
-            </a>
-          </div>
-          <div className="faq">
-            <h2>{d.pricing.faqTitle}</h2>
-            <div>
-              {d.pricing.faqs.map(([question, answer]) => (
-                <details key={question}>
-                  <summary>
-                    {question}
-                    <span aria-hidden="true">+</span>
-                  </summary>
-                  <p>{answer}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-    </section>
-  );
-}
-
-function PackageBuilder({ lang, d }: { lang: Language; d: Dictionary }) {
-  const [chosen, setChosen] = useState<number[]>([]);
-  const [box, setBox] = useState(-1);
-  const [copyState, setCopyState] = useState("");
-  const total =
-    chosen.reduce((t, i) => t + singlePrices[i], 0) +
-    (box >= 0 ? boxPrices[box] : 0);
-  const selection = [
-    ...chosen.map(
-      (i) => `${d.pricing.singleNames[i]} — ${money(singlePrices[i], lang)}`,
-    ),
-    ...(box >= 0
-      ? [
-          `${boxCounts[box]} ${boxCounts[box] === 1 ? d.pricing.boxUnit : d.pricing.boxUnits} — ${money(boxPrices[box], lang)}`,
-        ]
-      : []),
-  ];
-  const brief = `${d.pricing.copyPrefix}\n\n${selection.join("\n")}\n\n${d.pricing.copyPrice}: ${money(total, lang)}\n${d.pricing.condition}`;
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(brief);
-      setCopyState("ok");
-    } catch {
-      setCopyState("error");
-    }
-  };
-  return (
-    <section className="package-builder" aria-labelledby="builder-title">
-      <div>
-        <p className="eyebrow">SKO / {d.pricing.selection}</p>
-        <h2 id="builder-title">{d.pricing.builder}</h2>
-        <p>{d.pricing.builderDesc}</p>
-        <fieldset>
-          <legend>{d.pricing.singles}</legend>
-          {d.pricing.singleNames.map((n, i) => (
-            <label className="builder-choice" key={n}>
-              <input
-                type="checkbox"
-                checked={chosen.includes(i)}
-                onChange={() => {
-                  setChosen((v) =>
-                    v.includes(i) ? v.filter((x) => x !== i) : [...v, i],
-                  );
-                  setCopyState("");
-                }}
-              />
-              <span>{n}</span>
-              <strong>{money(singlePrices[i], lang)}</strong>
-            </label>
-          ))}
-        </fieldset>
-        <fieldset>
-          <legend>{d.pricing.boxes}</legend>
-          {boxCounts.map((n, i) => (
-            <label key={n} className="builder-choice">
-              <input
-                type="checkbox"
-                checked={box === i}
-                onChange={() => {
-                  setBox(box === i ? -1 : i);
-                  setCopyState("");
-                }}
-              />
-              <span>
-                {n} {n === 1 ? d.pricing.boxUnit : d.pricing.boxUnits}
-              </span>
-              <strong>{money(boxPrices[i], lang)}</strong>
-            </label>
-          ))}
-        </fieldset>
-      </div>
-      <div className="builder-summary">
-        <div className="builder-summary-top">
-          <span className="eyebrow">{d.pricing.selection}</span>
-          <Arrow diagonal />
-        </div>
-        <div className="builder-selection">
-          {selection.length ? (
-            <ul>
-              {selection.map((s) => (
-                <li key={s}>{s}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>{d.pricing.noSelection}</p>
-          )}
-        </div>
-        <div className="builder-total" aria-live="polite">
-          <span>{d.pricing.total}</span>
-          <strong>{money(total, lang)}</strong>
-        </div>
-        <button className="button" disabled={!selection.length} onClick={copy}>
-          {copyState === "ok" ? d.ui.copied : d.ui.copy}
-          <Arrow />
-        </button>
-        <div role="status">
-          {copyState === "ok" && <p className="copy-status">✓ {d.ui.copied}</p>}
-          {copyState === "error" && (
-            <>
-              <p>{d.ui.copyError}</p>
-              <pre className="copy-fallback">{brief}</pre>
-            </>
-          )}
-        </div>
-        <a
-          className="button button-outline"
-          href={discord}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {d.ui.order}
-          <Arrow diagonal />
-        </a>
-        <small>{d.pricing.builderNote}</small>
-      </div>
-    </section>
-  );
-}
-
 function Contact({ lang, d }: { lang: Language; d: Dictionary }) {
   return (
     <section className="contact-section container">
@@ -1286,6 +1084,7 @@ function Footer({
                   "portfolio",
                   "services",
                   "pricing",
+                  "planner",
                   "about",
                   "reviews",
                   "contact",
@@ -1329,7 +1128,26 @@ function Footer({
             © {new Date().getFullYear()} Sko Designs. {d.footer.copyright}
           </span>
           <a href={route(lang, "privacy")}>{d.nav.privacy}</a>
+          <a href={route(lang, "admin")}>{d.nav.admin}</a>
           <span>{d.footer.credit}</span>
+          <a
+            className="footer-credit"
+            href="https://discord.com/users/960090714950225970"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`By Gilles — Discord (${d.ui.newTab})`}
+          >
+            <img
+              src="/assets/gilles-discord-avatar.webp"
+              alt=""
+              width="26"
+              height="26"
+              loading="lazy"
+            />
+            <span>
+              By <strong>Gilles</strong>
+            </span>
+          </a>
           <a href="#main" aria-label={d.ui.home}>
             ↑
           </a>
@@ -1339,7 +1157,17 @@ function Footer({
   );
 }
 
-export default function Studio({ lang, page }: { lang: Language; page: Page }) {
+export default function Studio({
+  lang,
+  page,
+  catalog = projects,
+  pricing = basePricing(),
+}: {
+  lang: Language;
+  page: Page;
+  catalog?: Project[];
+  pricing?: PricingItem[];
+}) {
   const d = dictionaries[lang];
   useEffect(() => {
     document.documentElement.dataset.skoReady = "true";
@@ -1356,7 +1184,7 @@ export default function Studio({ lang, page }: { lang: Language; page: Page }) {
         {page === "home" && (
           <>
             <Hero lang={lang} d={d} />
-            <Portfolio lang={lang} d={d} />
+            <Portfolio lang={lang} d={d} catalog={catalog} />
             <ReferenceAbout lang={lang} d={d} />
             <PublicReviews lang={lang} />
             <ReferenceServices lang={lang} d={d} />
@@ -1370,7 +1198,7 @@ export default function Studio({ lang, page }: { lang: Language; page: Page }) {
               title={d.work.pageTitle}
               description={d.work.pageDescription}
             />
-            <Portfolio lang={lang} d={d} full />
+            <Portfolio lang={lang} d={d} full catalog={catalog} />
           </>
         )}
         {page === "services" && (
@@ -1392,7 +1220,7 @@ export default function Studio({ lang, page }: { lang: Language; page: Page }) {
               accent={d.pricing.accent}
               description={d.pricing.description}
             />
-            <Pricing lang={lang} d={d} full />
+            <ManagedPricing lang={lang} d={d} items={pricing} />
           </>
         )}
         {page === "about" && (
@@ -1428,6 +1256,10 @@ export default function Studio({ lang, page }: { lang: Language; page: Page }) {
             <Process d={d} />
           </>
         )}
+
+        {page === "planner" && <ProjectPlanner lang={lang} pricing={pricing} />}
+        {page === "admin" && <Admin lang={lang} />}
+
         {page === "privacy" && (
           <>
             <PageHeading

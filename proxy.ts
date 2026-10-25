@@ -9,6 +9,9 @@ export function proxy(request: NextRequest) {
       "/about",
       "/reviews",
       "/contact",
+      "/planner",
+      "/store",
+      "/admin",
     ].includes(path.replace(/\/$/, ""))
   ) {
     const saved = request.cookies.get("sko-language")?.value;
@@ -26,6 +29,8 @@ export function proxy(request: NextRequest) {
   const response = NextResponse.next({ request: { headers } });
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  if (path.includes("/admin") || path.startsWith("/api/auth"))
+    response.headers.set("Cache-Control", "no-store");
   return response;
 }
 export const config = {

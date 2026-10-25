@@ -10,10 +10,12 @@ export const pages = [
   "reviews",
   "contact",
   "privacy",
+  "planner",
+  "admin",
 ] as const;
 export type Page = (typeof pages)[number];
 export const discord = "https://discord.gg/skodesigns";
-export const canonicalOrigin = "https://thomdesigns.nl";
+export const canonicalOrigin = "https://skodesign.nl";
 export const languageNames = {
   nl: "Nederlands",
   en: "English",
@@ -108,8 +110,18 @@ const nl = {
     reviews: "Reviews",
     contact: "Contact",
     privacy: "Privacy",
+    planner: "Projectplanner",
+    admin: "Beheer",
   },
   seo: {
+    admin: [
+      "Staffbeheer",
+      "Beveiligd beheer voor Sko Designs-staff via Discord.",
+    ],
+    planner: [
+      "Stel jouw project samen",
+      "Maak een heldere briefing voor jouw logo, banner, thumbnail of designpakket. Stel je wensen samen en deel ze met Sko Designs via Discord.",
+    ],
     home: [
       "Grafisch design dat opvalt",
       "Sko Designs maakt logo’s, banners, thumbnails, Discord graphics en animaties voor creators, communities en online merken.",
@@ -295,8 +307,8 @@ const nl = {
   },
   reviews: {
     eyebrow: "04 — WOORDEN VAN KLANTEN",
-    title: "Mooi werk is één ding.",
-    accent: "Fijn samenwerken ook.",
+    title: "Reviews",
+    accent: "",
     description:
       "Ervaringen van klanten die hun review bij Sko Designs hebben geplaatst.",
     source: "Klantreview",
@@ -414,6 +426,10 @@ const nl = {
       "Deze website gebruikt geen advertentietrackers of analytische cookies. Reviews die je zelf indient, worden openbaar getoond.",
     sections: [
       [
+        "Stafflogin",
+        "Voor staffbeheer gebruiken we Discord-login. We controleren je profiel en staffrol op de ingestelde server. Een noodzakelijke beveiligde sessiecookie verloopt na maximaal één uur. De server bewaart het toegangstoken versleuteld; rolcontroles worden hoogstens tien seconden hergebruikt om Discord-verzoeklimieten te respecteren. Uitloggen verwijdert de sessie.",
+      ],
+      [
         "Taalvoorkeur",
         "We bewaren je gekozen taal (nl, en of fr) en lichte of donkere weergave lokaal in je browser. Een voorkeurcookie onthoudt je taal voor een volgend bezoek. Je kunt deze voorkeuren wissen via je browserinstellingen.",
       ],
@@ -454,8 +470,18 @@ const en: typeof nl = {
     reviews: "Reviews",
     contact: "Contact",
     privacy: "Privacy",
+    planner: "Project planner",
+    admin: "Admin",
   },
   seo: {
+    admin: [
+      "Staff admin",
+      "Secure management for Sko Designs staff through Discord.",
+    ],
+    planner: [
+      "Plan your design project",
+      "Build a clear brief for your logo, banner, thumbnail or design package. Put your ideas together and share them with Sko Designs on Discord.",
+    ],
     home: [
       "Graphic design that stands out",
       "Sko Designs creates logos, banners, thumbnails, Discord graphics and animations for creators, communities and online brands.",
@@ -644,8 +670,8 @@ const en: typeof nl = {
   },
   reviews: {
     eyebrow: "04 — CLIENT WORDS",
-    title: "Great design is one thing.",
-    accent: "Working well together matters too.",
+    title: "Reviews",
+    accent: "",
     description:
       "Experiences shared by clients who have posted a review with Sko Designs.",
     source: "Client review",
@@ -764,6 +790,10 @@ const en: typeof nl = {
       "This website uses no advertising trackers or analytics cookies. Reviews you submit are displayed publicly.",
     sections: [
       [
+        "Staff sign-in",
+        "Staff management uses Discord sign-in to check your profile and staff role in the configured server. An essential secure session cookie expires after at most one hour. The server stores the access token encrypted; role checks are reused for up to ten seconds to respect Discord rate limits. Signing out deletes the session.",
+      ],
+      [
         "Language preference",
         "Your selected language (nl, en or fr) and light or dark theme are saved locally in your browser. A preference cookie remembers your language for return visits. You can remove these preferences in your browser settings.",
       ],
@@ -804,8 +834,18 @@ const fr: typeof nl = {
     reviews: "Avis",
     contact: "Contact",
     privacy: "Confidentialité",
+    planner: "Préparer un projet",
+    admin: "Administration",
   },
   seo: {
+    admin: [
+      "Administration de l’équipe",
+      "Espace sécurisé pour l’équipe Sko Designs via Discord.",
+    ],
+    planner: [
+      "Préparez votre projet graphique",
+      "Composez un brief clair pour votre logo, bannière, miniature ou pack graphique. Rassemblez vos envies et partagez-les avec Sko Designs sur Discord.",
+    ],
     home: [
       "Du design graphique qui se démarque",
       "Sko Designs crée logos, bannières, miniatures YouTube, visuels Discord et animations pour les créateurs, communautés et marques en ligne.",
@@ -995,8 +1035,8 @@ const fr: typeof nl = {
   },
   reviews: {
     eyebrow: "04 — LA PAROLE AUX CLIENTS",
-    title: "Un beau design compte.",
-    accent: "Une belle collaboration aussi.",
+    title: "Avis",
+    accent: "",
     description:
       "Les expériences des clients ayant publié un avis chez Sko Designs.",
     source: "Avis client",
@@ -1114,6 +1154,10 @@ const fr: typeof nl = {
     intro:
       "Ce site n’utilise aucun traceur publicitaire ni cookie analytique. Les avis que vous publiez sont affichés publiquement.",
     sections: [
+      [
+        "Connexion de l’équipe",
+        "L’administration utilise Discord pour vérifier votre profil et votre rôle sur le serveur configuré. Un cookie de session essentiel et sécurisé expire au plus tard après une heure. Le jeton d’accès est chiffré sur le serveur ; les contrôles de rôle sont réutilisés dix secondes au maximum pour respecter les limites de Discord. La déconnexion supprime la session.",
+      ],
       [
         "Préférence linguistique",
         "Votre langue (nl, en ou fr) et le thème clair ou sombre sont enregistrés dans votre navigateur. Un cookie de préférence mémorise votre langue pour vos prochaines visites. Vous pouvez supprimer ces préférences dans les paramètres du navigateur.",

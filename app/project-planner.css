@@ -1,0 +1,721 @@
+.project-planner {
+  padding: 65px 0 80px;
+}
+.planner-heading {
+  max-width: 830px;
+  margin-bottom: 37px;
+}
+.planner-heading .eyebrow {
+  color: var(--blue);
+}
+.planner-heading h1 {
+  font-size: clamp(38px, 4.8vw, 62px);
+  line-height: 1.13;
+  margin-top: 16px;
+  letter-spacing: -0.055em;
+}
+.planner-heading > p:last-child {
+  max-width: 650px;
+  font-size: 15px;
+  line-height: 1.9;
+  margin-top: 21px;
+}
+.planner-progress {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 29px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 850px;
+}
+.planner-progress li {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 15px;
+  min-width: 0;
+}
+.planner-progress button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.6;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  min-height: 38px;
+  color: var(--muted);
+  width: 100%;
+}
+.planner-progress button:disabled {
+  opacity: 1;
+}
+.planner-step-number {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-size: 10px;
+  background: var(--surface, #fff);
+}
+.planner-progress .current {
+  border-color: var(--blue);
+}
+.planner-progress .current button {
+  color: var(--blue);
+}
+.planner-progress .current .planner-step-number {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+.planner-progress .complete .planner-step-number {
+  background: #1045f50c;
+  border-color: #1045f544;
+  color: var(--blue);
+}
+.planner-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.planner-panel {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface, #fff);
+  padding: 34px;
+  min-width: 0;
+  box-shadow: 0 10px 40px #12326d05;
+}
+.planner-step-caption {
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 13px;
+}
+.planner-panel h2 {
+  font-size: 29px;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  max-width: 620px;
+}
+.planner-panel h2:focus {
+  outline: none;
+}
+.planner-panel-description {
+  font-size: 13px;
+  line-height: 1.9;
+  margin-top: 13px;
+  max-width: 560px;
+}
+.planner-services {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+  border: 0;
+  padding: 0;
+  margin: 27px 0 0;
+  min-width: 0;
+}
+.planner-service {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 9px;
+  padding: 20px 34px 20px 18px;
+  min-height: 98px;
+  background: var(--page, var(--soft));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
+  min-width: 0;
+}
+.planner-service:hover {
+  border-color: #1045f577;
+}
+.planner-service.selected {
+  border-color: var(--blue);
+  background: #1045f506;
+  box-shadow: 0 0 0 1px var(--blue);
+}
+.planner-service input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.planner-service:has(input:focus-visible) {
+  outline: 3px solid var(--blue);
+  outline-offset: 4px;
+}
+.planner-service strong {
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.planner-service small {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.planner-choice-mark {
+  position: absolute;
+  right: 13px;
+  top: 13px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  width: 17px;
+  height: 17px;
+  font-size: 9px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.planner-service.selected .planner-choice-mark {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+.planner-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  margin-top: 27px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.planner-controls > p {
+  font-size: 10px;
+  max-width: 240px;
+  line-height: 1.8;
+}
+.planner-controls .button {
+  min-width: 165px;
+  gap: 19px;
+  font-size: 12px;
+}
+.planner-controls .text-link {
+  gap: 12px;
+  font-size: 12px;
+}
+.planner-summary {
+  position: sticky;
+  top: 115px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  min-width: 0;
+}
+.planner-summary-art {
+  position: relative;
+  isolation: isolate;
+  min-height: 195px;
+  background: linear-gradient(140deg, #eef3ff, #f7f9ff);
+  display: grid;
+  place-items: center;
+  padding: 30px 28px;
+  overflow: hidden;
+}
+.planner-summary-art img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  position: relative;
+  z-index: 1;
+  transform: rotate(-5deg);
+}
+.planner-art-orbit {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border: 1px solid #1045f515;
+  border-radius: 50%;
+  right: -70px;
+  top: -130px;
+}
+.planner-art-orbit:after {
+  content: "";
+  position: absolute;
+  inset: 25px;
+  border: 1px solid #1045f50d;
+  border-radius: 50%;
+}
+.planner-summary-copy {
+  padding: 27px;
+}
+.planner-summary-copy > .eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--blue);
+}
+.planner-summary-copy h2 {
+  font-size: 23px;
+  margin-top: 12px;
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+}
+.planner-summary-copy > p:not(.eyebrow) {
+  font-size: 12px;
+  line-height: 1.9;
+  margin-top: 13px;
+}
+.planner-summary-copy dl {
+  display: grid;
+  gap: 19px;
+  margin: 25px 0 17px;
+}
+.planner-summary-copy dl > div {
+  display: grid;
+  gap: 5px;
+}
+.planner-summary-copy dt {
+  color: var(--muted);
+  font-size: 10px;
+}
+.planner-summary-copy dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.planner-summary-copy dd.planner-summary-price {
+  font-size: 24px;
+  color: var(--blue);
+  letter-spacing: -0.04em;
+}
+.planner-summary-copy > small {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--muted);
+  display: block;
+}
+.planner-summary-copy .planner-summary-privacy {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  font-size: 10px !important;
+  margin-top: 20px !important;
+}
+.planner-fields {
+  display: grid;
+  gap: 22px;
+  margin-top: 28px;
+}
+.planner-field {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+.planner-field > label {
+  font-size: 12px;
+  line-height: 1.6;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+.planner-field > label small {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.planner-field input,
+.planner-field select,
+.planner-field textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 13px;
+  color: var(--ink);
+  background: var(--page, var(--soft));
+  min-height: 46px;
+  min-width: 0;
+}
+.planner-field textarea {
+  resize: vertical;
+}
+.planner-field input::placeholder,
+.planner-field textarea::placeholder {
+  color: var(--secondary);
+  opacity: 1;
+}
+.planner-field input[aria-invalid="true"],
+.planner-field textarea[aria-invalid="true"] {
+  border-color: #bf3942;
+}
+.planner-fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.planner-field-hint {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 17px;
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.planner-field-hint small {
+  font-size: 10px;
+}
+.planner-field-hint span {
+  font-size: 9px;
+  flex-shrink: 0;
+}
+.planner-error {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #bf3942;
+  grid-column: 1/-1;
+}
+.planner-result {
+  margin-top: 25px;
+}
+.planner-local-notice {
+  display: flex;
+  gap: 12px;
+  padding: 17px;
+  border: 1px solid #1045f52b;
+  border-radius: 9px;
+  background: #1045f505;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.planner-local-notice > span {
+  color: var(--blue);
+  font-size: 18px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+.planner-brief {
+  font:
+    12px/1.9 Manrope,
+    Arial,
+    sans-serif;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--page, var(--soft));
+  padding: 21px;
+  max-height: 540px;
+  overflow: auto;
+  margin: 20px 0;
+  color: var(--ink);
+}
+.planner-result-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.planner-result-buttons .button {
+  font-size: 11px;
+  padding: 14px 17px;
+  gap: 14px;
+}
+.planner-result-status {
+  min-height: 27px;
+  padding-top: 8px;
+  font-size: 11px;
+  color: var(--blue);
+  line-height: 1.8;
+}
+.planner-result-status.error {
+  color: #bf3942;
+}
+.planner-discord-link {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #1045f52b;
+  border-radius: 8px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 14px 17px;
+  min-height: 48px;
+  transition: background 0.2s;
+}
+.planner-discord-link:hover {
+  background: #1045f507;
+}
+.planner-discord-link > span {
+  font-size: 19px;
+}
+@media (max-width: 1000px) {
+  .planner-layout {
+    grid-template-columns: minmax(0, 1.5fr) minmax(250px, 1fr);
+    gap: 20px;
+  }
+  .planner-panel {
+    padding: 26px;
+  }
+  .planner-services {
+    gap: 11px;
+  }
+  .planner-service {
+    padding: 17px 28px 17px 14px;
+  }
+  .planner-service strong {
+    font-size: 12px;
+  }
+  .planner-service small {
+    font-size: 10px;
+  }
+  .planner-summary-copy {
+    padding: 23px;
+  }
+  .planner-summary-art {
+    min-height: 170px;
+    padding: 25px 20px;
+  }
+  .planner-controls .button {
+    min-width: 145px;
+    font-size: 11px;
+  }
+  .planner-controls {
+    gap: 18px;
+  }
+  .planner-fields-row {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .project-planner {
+    padding: 43px 0 60px;
+  }
+  .planner-heading {
+    margin-bottom: 28px;
+  }
+  .planner-heading h1 {
+    font-size: 41px;
+  }
+  .planner-heading > p:last-child {
+    font-size: 14px;
+    margin-top: 17px;
+  }
+  .planner-progress {
+    gap: 10px;
+    margin-bottom: 23px;
+  }
+  .planner-progress button {
+    font-size: 10px;
+    gap: 8px;
+    line-height: 1.6;
+    align-items: flex-start;
+  }
+  .planner-step-number {
+    width: 27px;
+    height: 27px;
+    font-size: 9px;
+  }
+  .planner-progress li {
+    padding-bottom: 12px;
+  }
+  .planner-layout {
+    grid-template-columns: 1fr;
+    gap: 23px;
+  }
+  .planner-panel {
+    padding: 26px;
+  }
+  .planner-panel h2 {
+    font-size: 27px;
+  }
+  .planner-panel-description {
+    font-size: 13px;
+  }
+  .planner-services {
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .planner-service {
+    padding: 19px 32px 19px 16px;
+    min-height: 98px;
+  }
+  .planner-service strong {
+    font-size: 13px;
+  }
+  .planner-service small {
+    font-size: 11px;
+  }
+  .planner-summary {
+    position: static;
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+  }
+  .planner-summary-art {
+    min-height: 250px;
+  }
+  .planner-summary-copy {
+    padding: 25px;
+  }
+  .planner-summary-copy h2 {
+    font-size: 22px;
+  }
+  .planner-summary-copy dl {
+    gap: 15px;
+    margin-top: 20px;
+  }
+  .planner-summary-copy .planner-summary-privacy {
+    display: none;
+  }
+  .planner-field input,
+  .planner-field textarea,
+  .planner-field select {
+    font-size: 16px;
+  }
+  .planner-fields-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .planner-field > label {
+    font-size: 12px;
+  }
+  .planner-brief {
+    font-size: 12px;
+  }
+  .planner-result-buttons .button {
+    flex: 1;
+  }
+}
+@media (max-width: 480px) {
+  .planner-heading h1 {
+    font-size: 36px;
+  }
+  .planner-progress {
+    gap: 8px;
+  }
+  .planner-progress button {
+    flex-direction: column;
+    gap: 9px;
+    font-size: 10px;
+  }
+  .planner-progress li {
+    padding-bottom: 13px;
+  }
+  .planner-panel {
+    padding: 24px 19px;
+    border-radius: 13px;
+  }
+  .planner-panel h2 {
+    font-size: 25px;
+  }
+  .planner-panel-description {
+    font-size: 12px;
+  }
+  .planner-services {
+    gap: 10px;
+  }
+  .planner-service {
+    padding: 18px 25px 18px 13px;
+    min-height: 105px;
+  }
+  .planner-service strong {
+    font-size: 12px;
+  }
+  .planner-service small {
+    font-size: 10px;
+  }
+  .planner-choice-mark {
+    right: 9px;
+    top: 9px;
+    width: 15px;
+    height: 15px;
+    font-size: 8px;
+  }
+  .planner-controls {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .planner-controls > p {
+    font-size: 10px;
+    max-width: none;
+  }
+  .planner-controls .button {
+    min-width: 145px;
+    margin-left: auto;
+  }
+  .planner-controls .text-link {
+    font-size: 11px;
+  }
+  .planner-summary {
+    grid-template-columns: 1fr;
+  }
+  .planner-summary-art {
+    min-height: 155px;
+    padding: 26px 45px;
+  }
+  .planner-summary-art img {
+    max-width: 245px;
+  }
+  .planner-summary-copy {
+    padding: 23px;
+  }
+  .planner-summary-copy dl {
+    grid-template-columns: 1fr 1fr;
+    gap: 19px 15px;
+  }
+  .planner-summary-copy dl > div:last-child {
+    grid-column: 1/-1;
+  }
+  .planner-summary-copy dd.planner-summary-price {
+    font-size: 23px;
+  }
+  .planner-fields-row {
+    grid-template-columns: 1fr;
+  }
+  .planner-field > label {
+    font-size: 12px;
+  }
+  .planner-field-hint {
+    gap: 10px;
+  }
+  .planner-field-hint small {
+    font-size: 10px;
+  }
+  .planner-local-notice {
+    padding: 14px;
+    font-size: 11px;
+  }
+  .planner-brief {
+    padding: 17px;
+    font-size: 11px;
+  }
+  .planner-result-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .planner-result-buttons .button {
+    width: 100%;
+  }
+  .planner-discord-link {
+    font-size: 12px;
+  }
+}

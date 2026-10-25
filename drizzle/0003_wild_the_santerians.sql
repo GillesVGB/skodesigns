@@ -1,0 +1,1 @@
+ALTER TABLE `staff_sessions` ADD `verified_at` integer;
