@@ -95,7 +95,9 @@ async function decryptToken(cipher: string) {
 }
 export function redirectUri(r: Request) {
   const origin=publicOrigin(r);
-  if(["https://skodesign.nl","https://sko-designs.gilles-vangroenderbe.chatgpt.site","http://127.0.0.1:5174"].includes(origin))return origin+"/api/auth/discord/callback/";
+  // Keep production Discord OAuth on the public canonical domain, never the private Site origin.
+  if(origin==="https://www.skodesign.nl"||origin==="https://skodesign.nl")return "https://www.skodesign.nl/api/auth/discord/callback/";
+  if(origin==="http://127.0.0.1:5174")return origin+"/api/auth/discord/callback/";
   return (
     env.DISCORD_REDIRECT_URI ||
     new URL("/api/auth/discord/callback/", r.url).href
