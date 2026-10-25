@@ -10,6 +10,7 @@ import {
   redirectUri,
   setCookie,
   staffConfig,
+  publicOrigin,
 } from "@/lib/staff-auth";
 export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
   const lang = ["nl", "en", "fr"].includes(savedLang) ? savedLang : "nl";
   const finish = (result: string, sessionCookie?: string) => {
     const headers = new Headers({
-      Location: new URL(`/${lang}/admin/?login=${result}`, url).href,
+      Location: new URL(`/${lang}/admin/?login=${result}`, publicOrigin(request)).href,
       "Cache-Control": "no-store",
       "Referrer-Policy": "no-referrer",
     });

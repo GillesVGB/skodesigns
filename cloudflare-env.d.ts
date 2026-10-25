@@ -7,5 +7,6 @@ declare namespace Cloudflare {
     DISCORD_GUILD_ID?: string;
     DISCORD_STAFF_ROLE_ID?: string;
     DISCORD_REDIRECT_URI?: string;
+    SKO_PUBLIC_PROXY_SECRET?: string;
   }
 }

@@ -23,8 +23,13 @@ export const json = (body: unknown, status = 200) =>
       "X-Content-Type-Options": "nosniff",
     },
   });
-export const sameOrigin = (r: Request) =>
-  r.headers.get("Origin") === new URL(r.url).origin;
+export function trustedProxy(r:Request){return !!env.SKO_PUBLIC_PROXY_SECRET && r.headers.get("X-Sko-Proxy-Secret") === env.SKO_PUBLIC_PROXY_SECRET;}
+export function publicOrigin(r:Request){
+  const forwarded=r.headers.get("X-Sko-Forwarded-Origin");
+  if(trustedProxy(r)&&forwarded&&["https://skodesign.nl","https://www.skodesign.nl"].includes(forwarded))return forwarded;
+  return new URL(r.url).origin;
+}
+export const sameOrigin = (r: Request) => r.headers.get("Origin") === publicOrigin(r);
 export const cookie = (r: Request, name: string) => {
   const value = r.headers
     .get("Cookie")
@@ -89,7 +94,7 @@ async function decryptToken(cipher: string) {
   );
 }
 export function redirectUri(r: Request) {
-  const origin=new URL(r.url).origin;
+  const origin=publicOrigin(r);
   if(["https://skodesign.nl","https://sko-designs.gilles-vangroenderbe.chatgpt.site","http://127.0.0.1:5174"].includes(origin))return origin+"/api/auth/discord/callback/";
   return (
     env.DISCORD_REDIRECT_URI ||

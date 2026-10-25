@@ -28,7 +28,7 @@ const nl = {
   category: "Categorie",
   image: "Afbeelding",
   imageHelp:
-    "PNG, JPG of statische WebP. Maximaal 8 MB en 8192 pixels per zijde.",
+    "PNG, JPG of statische WebP. Maximaal 3 MB en 8192 pixels per zijde.",
   featured: "Toon bij recent werk op de homepage",
   descriptionNl: "Beschrijving — Nederlands",
   descriptionEn: "Beschrijving — Engels",
@@ -42,7 +42,7 @@ const nl = {
   empty: "Hier staan nog geen items.",
   error: "De actie is niet uitgevoerd. Probeer het opnieuw.",
   invalid: "Vul alle verplichte velden correct in.",
-  tooLarge: "De afbeelding mag maximaal 8 MB groot zijn.",
+  tooLarge: "De afbeelding mag maximaal 3 MB groot zijn.",
   invalidImage:
     "Kies een geldige PNG, JPG of statische WebP binnen de toegestane afmetingen.",
   sessionExpired:
@@ -101,7 +101,7 @@ const en: typeof nl = {
   category: "Category",
   image: "Image",
   imageHelp:
-    "PNG, JPG or static WebP. Up to 8 MB and 8192 pixels on each side.",
+    "PNG, JPG or static WebP. Up to 3 MB and 8192 pixels on each side.",
   featured: "Show in recent work on the homepage",
   descriptionNl: "Description — Dutch",
   descriptionEn: "Description — English",
@@ -115,7 +115,7 @@ const en: typeof nl = {
   empty: "There are no items here yet.",
   error: "The action was not completed. Please try again.",
   invalid: "Complete all required fields correctly.",
-  tooLarge: "The image must be no larger than 8 MB.",
+  tooLarge: "The image must be no larger than 3 MB.",
   invalidImage:
     "Choose a valid PNG, JPG or static WebP within the allowed dimensions.",
   sessionExpired:
@@ -174,7 +174,7 @@ const fr: typeof nl = {
   titleLabel: "Titre / nom du projet",
   category: "Catégorie",
   image: "Image",
-  imageHelp: "PNG, JPG ou WebP statique. Maximum 8 Mo et 8192 pixels par côté.",
+  imageHelp: "PNG, JPG ou WebP statique. Maximum 3 Mo et 8192 pixels par côté.",
   featured: "Afficher dans les créations récentes de l’accueil",
   descriptionNl: "Description — néerlandais",
   descriptionEn: "Description — anglais",
@@ -188,7 +188,7 @@ const fr: typeof nl = {
   empty: "Aucun élément pour le moment.",
   error: "L’action n’a pas été effectuée. Veuillez réessayer.",
   invalid: "Remplissez correctement tous les champs obligatoires.",
-  tooLarge: "L’image ne doit pas dépasser 8 Mo.",
+  tooLarge: "L’image ne doit pas dépasser 3 Mo.",
   invalidImage:
     "Choisissez un PNG, JPG ou WebP statique valide respectant les dimensions autorisées.",
   sessionExpired:

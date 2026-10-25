@@ -4,6 +4,7 @@ import {
   redirectUri,
   setCookie,
   staffConfig,
+  publicOrigin,
 } from "@/lib/staff-auth";
 export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
@@ -11,7 +12,7 @@ export async function GET(request: Request) {
   const locale = ["nl", "en", "fr"].includes(lang) ? lang : "nl";
   if (!configured())
     return Response.redirect(
-      new URL(`/${locale}/admin/?login=setup`, request.url),
+      new URL(`/${locale}/admin/?login=setup`, publicOrigin(request)),
       303,
     );
   const state = randomToken();

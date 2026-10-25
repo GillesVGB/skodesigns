@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/client",
+  "functions": {"api/site.ts": {"maxDuration": 60}},
+  "redirects": [{"source":"/:path*","has":[{"type":"host","value":"www.skodesign.nl"}],"destination":"https://skodesign.nl/:path*","permanent":true}],
+  "rewrites": [{"source":"/:path*","destination":"/api/site?path=:path*"}]
+}

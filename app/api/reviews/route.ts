@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import {publicOrigin,trustedProxy} from "@/lib/staff-auth";
 
 export const dynamic = "force-dynamic";
 const headers = {
@@ -26,7 +27,7 @@ export async function GET() {
 export async function POST(request: Request) {
   if (!env.DB) return reply({ error: "unavailable" }, 503);
   const origin = request.headers.get("Origin");
-  if (!origin || origin !== new URL(request.url).origin)
+  if (!origin || origin !== publicOrigin(request))
     return reply({ error: "forbidden" }, 403);
   if (
     !request.headers
@@ -89,6 +90,7 @@ export async function POST(request: Request) {
   try {
     const now = Date.now();
     const source =
+      (trustedProxy(request) ? request.headers.get("X-Sko-Client-IP") : null) ||
       request.headers.get("cf-connecting-ip") ||
       request.headers.get("oai-authenticated-user-id") ||
       "local-preview";

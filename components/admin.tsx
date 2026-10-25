@@ -142,7 +142,7 @@ export default function Admin({ lang }: { lang: Language }) {
       setError(t.requiredImage);
       return;
     }
-    if (file.size > 8_000_000) {
+    if (file.size > 3_000_000) {
       setError(t.tooLarge);
       return;
     }
