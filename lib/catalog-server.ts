@@ -1,8 +1,8 @@
-import { env } from "cloudflare:workers";
+import { env } from "./platform";
 import { projects, type Project } from "@/lib/content";
 import { basePricing, type PricingItem } from "@/lib/pricing-catalog";
 export async function readCatalog(): Promise<Project[]> {
-  if (!env.DB) return [];
+  if (!env.DB) return projects;
   const [hidden, added] = await env.DB.batch([
     env.DB.prepare("SELECT id FROM hidden_projects"),
     env.DB.prepare(
@@ -10,7 +10,7 @@ export async function readCatalog(): Promise<Project[]> {
     ),
   ]);
   const hiddenIds = new Set(
-    (hidden.results as { id: string }[]).map((row) => row.id),
+    (hidden.results as unknown as { id: string }[]).map((row) => row.id),
   );
   const additions = (added.results as Record<string, unknown>[]).map((row) => ({
     ...row,
@@ -22,7 +22,7 @@ export async function readCatalog(): Promise<Project[]> {
   ];
 }
 export async function readPricing(): Promise<PricingItem[]> {
-  if (!env.DB) return [];
+  if (!env.DB) return basePricing();
   const rows = await env.DB.prepare(
     "SELECT * FROM store_items ORDER BY created_at ASC",
   ).all<PricingItem & { deleted_at: number | null }>();

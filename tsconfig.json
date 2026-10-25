@@ -27,10 +27,7 @@
         "./*"
       ]
     },
-    "types": [
-      "node",
-      "@cloudflare/workers-types"
-    ]
+    "types": ["node"]
   },
   "include": [
     "next-env.d.ts",
@@ -47,6 +44,11 @@
     ".vinext",
     ".wrangler",
     ".sites-runtime",
+    "worker",
+    "scripts",
+    "cloudflare-env.d.ts",
+    "vite.config.ts",
+    "drizzle.config.ts",
     "outputs",
     "work"
   ]

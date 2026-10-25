@@ -1,4 +1,4 @@
-import { env } from "cloudflare:workers";
+import { env } from "./platform";
 import { canonicalOrigin } from "./content";
 
 export const staffConfig = () => ({
@@ -24,11 +24,10 @@ export const json = (body: unknown, status = 200) =>
       "X-Content-Type-Options": "nosniff",
     },
   });
-export function trustedProxy(r:Request){return !!env.SKO_PUBLIC_PROXY_SECRET && r.headers.get("X-Sko-Proxy-Secret") === env.SKO_PUBLIC_PROXY_SECRET;}
 export function publicOrigin(r:Request){
-  const forwarded=r.headers.get("X-Sko-Forwarded-Origin");
-  if(trustedProxy(r)&&forwarded&&["https://skodesign.nl","https://www.skodesign.nl"].includes(forwarded))return forwarded;
-  return new URL(r.url).origin;
+  const origin = new URL(r.url).origin;
+  if (origin === "http://127.0.0.1:5174" || origin === "http://localhost:5174") return origin;
+  return canonicalOrigin;
 }
 export const sameOrigin = (r: Request) => r.headers.get("Origin") === publicOrigin(r);
 export const cookie = (r: Request, name: string) => {
@@ -96,9 +95,7 @@ async function decryptToken(cipher: string) {
 }
 export function redirectUri(r: Request) {
   const origin=publicOrigin(r);
-  // Discord OAuth must always return to the public canonical site, never its private Site origin.
-  if(origin==="http://127.0.0.1:5174")return origin+"/api/auth/discord/callback/";
-  return `${canonicalOrigin}/api/auth/discord/callback/`;
+  return `${origin}/api/auth/discord/callback/`;
 }
 export async function discordRequest(path: string, token: string) {
   return fetch("https://discord.com/api/v10" + path, {

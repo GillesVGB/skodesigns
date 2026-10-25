@@ -1,4 +1,4 @@
-import { env } from "cloudflare:workers";
+import { env } from "@/lib/platform";
 export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const path = new URL(request.url).pathname;

@@ -1,17 +1,17 @@
 # Sko Designs
 
-A complete multilingual creative-studio website, built with React, TypeScript and Vinext (Next.js App Router compatible) for Cloudflare Workers / Sites.
+A multilingual creative-studio website built with Next.js, React and TypeScript. The website and API run in the same Vercel project on `www.skodesign.nl`; the application does not proxy to a private Sites hostname.
 
 ## Run locally
 
-Requires Node.js 22.13 or later.
+Requires Node.js 22.13 or later. Create `.env.local` from `.env.example` and add the Postgres, Blob and Discord credentials before testing the API locally.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open the Local URL printed by the server. Build with `npm run build`. The Sites publishing workflow uses its `build-site.mjs` helper. The hosting identity is stored in `.openai/hosting.json`.
+Open `http://127.0.0.1:5174`. Build with `npm run build`.
 
 ## Content and design
 
@@ -22,24 +22,25 @@ Open the Local URL printed by the server. Build with `npm run build`. The Sites 
 - `proxy.ts`: server-rendered document language and redirects for existing unprefixed links.
 - `public/assets`: the supplied Sko branding, nine recent works, optimized static animation previews, Gilles' Discord avatar and a self-hosted Manrope variable font.
 - `components/project-planner.tsx` and `lib/planner-copy.ts`: a local three-step project brief builder with validated fields, clipboard copy and text-file download in all languages.
-- `components/public-reviews.tsx` and `app/api/reviews/route.ts`: real review submission with a public-consent checkbox, server validation and D1 persistence. Apply the tracked Drizzle migration to the local D1 binding before testing reviews locally.
+- `components/public-reviews.tsx` and `app/api/reviews/route.ts`: real review submission with a public-consent checkbox, server validation and Postgres persistence.
 - `components/admin.tsx`: Discord staff login and management of recent work, the existing pricing page and reviews. There is no separate store page: pricing is the store.
 - `lib/pricing-catalog.ts`: the original price list; database overrides and new items feed the pricing page, package calculator and project planner together.
 - `lib/staff-auth.ts`: authorization-code OAuth with state validation, encrypted access tokens, opaque HttpOnly session cookies and server-side membership checks. Sessions expire within one hour; positive role checks are reused for at most ten seconds to avoid Discord rate limits. Removing a staff role therefore takes effect within ten seconds. API failures deny access.
-- Staff uploads use R2, a maximum size of 8 MB, validated PNG/JPEG/static WebP headers and bounded image dimensions. Deleting portfolio and price items unpublishes them, with an immediate Undo action. Deleting a review permanently removes that record after an explicit confirmation in the UI.
+- `lib/platform.ts`: Postgres-backed persistence and private Vercel Blob storage for staff uploads. The first API request creates the required tables and indexes if the database is empty.
+- Staff uploads have an 8 MB limit and validated PNG/JPEG/static WebP headers and bounded image dimensions. Deleting portfolio and price items unpublishes them, with an immediate Undo action. Deleting a review permanently removes that record after an explicit confirmation in the UI.
 
 ## Discord staff access
 
 The configured server is `1562896437082071090`, the staff role is `1563635614287663185` and the Discord application is `1564008974720958464`. The application requests only `identify` and `guilds.members.read`; no bot token is needed.
 
-Required server variables are `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_GUILD_ID` and `DISCORD_STAFF_ROLE_ID`. Runtime secrets are stored in Sites. Local values use an ignored `.dev.vars` file; never commit that file. Restart the development server after changing local runtime variables.
+Required variables are `DATABASE_URL` (or the Vercel integration's `POSTGRES_URL`), `BLOB_READ_WRITE_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_GUILD_ID` and `DISCORD_STAFF_ROLE_ID`. Add them to the Vercel project for Production (and Preview if you use previews). For local development, store them in the ignored `.env.local` file. Never commit that file.
 
 Required Discord OAuth redirects to register in the application settings:
 
 - `http://127.0.0.1:5174/api/auth/discord/callback/`
 - `https://www.skodesign.nl/api/auth/discord/callback/` (production; exact match, including the trailing slash)
 
-The protected page is `/nl/admin/` (or `/en/admin/`, `/fr/admin/`). All write endpoints verify the session, staff role and same-origin request before changing data. Local D1/R2 data is separate from the hosted data; local test content is never copied to production.
+The protected page is `/nl/admin/` (or `/en/admin/`, `/fr/admin/`). All write endpoints verify the session, staff role and same-origin request before changing data.
 
 ## Factual sources and decisions
 
@@ -53,9 +54,9 @@ Ordering is through the latest user-confirmed Discord invitation: https://discor
 
 ## Domain and deployment
 
-The production domain is `https://www.skodesign.nl`; the Vercel project should use `www` as its primary domain and redirect the apex domain to it. Vercel rewrites the homepage and other requests to the proxy in `api/site.ts`. The Vercel project must deploy this repository's `main` branch and have `SKO_BACKEND_URL`, `SKO_BACKEND_TOKEN` and `SKO_PUBLIC_PROXY_SECRET` configured. The existing thomdesigns.nl host and DNS have not been changed.
+The production domain is `https://www.skodesign.nl`; the Vercel project should use `www` as its primary domain and redirect the apex domain to it. The app and its `/api/*` routes deploy together from this repository's `main` branch. No catch-all proxy, second host or subdomain is required. Connect a Postgres database and a private Blob store to Vercel, then add the variables listed above. Register `https://www.skodesign.nl/api/auth/discord/callback/` as the production OAuth redirect URI in Discord.
 
-The Sites preview keeps its existing owner-private audience. Source is also pushed to the user-requested GitHub repository `https://github.com/GillesVGB/skodesigns`.
+Source is also pushed to the user-requested GitHub repository `https://github.com/GillesVGB/skodesigns`.
 
 ## Verification
 

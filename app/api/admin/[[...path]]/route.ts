@@ -1,4 +1,4 @@
-import { env } from "cloudflare:workers";
+import { env } from "@/lib/platform";
 import { projects } from "@/lib/content";
 import { readCatalog, readPricing } from "@/lib/catalog-server";
 import { boundedBytes, imageInfo } from "@/lib/image-upload";
@@ -130,6 +130,9 @@ export async function POST(request: Request) {
     if (title.length < 2 || title.length > 120)
       return json({ error: "invalid" }, 400);
     const image = typeof data.image === "string" ? data.image : "";
+    const category = String(data.category);
+    const width = Number(data.width);
+    const height = Number(data.height);
     if (
       image &&
       (!/^\/api\/media\/[a-f0-9-]{36}\.(png|jpg|webp)\/$/.test(image) ||
@@ -168,10 +171,10 @@ export async function POST(request: Request) {
         .bind(
           id,
           title,
-          data.category,
+          category,
           image,
-          data.width,
-          data.height,
+          width,
+          height,
           data.featured === true ? 1 : 0,
           Date.now(),
         )
@@ -188,6 +191,7 @@ export async function POST(request: Request) {
           : "",
       );
       const kind = String(data.kind);
+      const price = Number(data.price);
       const quantity = kind === "box" ? Number(data.quantity) : null;
       if (
         titles.some((v) => v.length < 2 || v.length > 120) ||
@@ -210,7 +214,7 @@ export async function POST(request: Request) {
           title,
           ...titles,
           ...descriptions,
-          data.price,
+          price,
           null,
           Date.now(),
           kind,

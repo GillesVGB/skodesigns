@@ -1,5 +1,5 @@
-import { env } from "cloudflare:workers";
-import {publicOrigin,trustedProxy} from "@/lib/staff-auth";
+import { env } from "@/lib/platform";
+import {publicOrigin} from "@/lib/staff-auth";
 
 export const dynamic = "force-dynamic";
 const headers = {
@@ -90,9 +90,8 @@ export async function POST(request: Request) {
   try {
     const now = Date.now();
     const source =
-      (trustedProxy(request) ? request.headers.get("X-Sko-Client-IP") : null) ||
-      request.headers.get("cf-connecting-ip") ||
-      request.headers.get("oai-authenticated-user-id") ||
+      request.headers.get("x-real-ip") ||
+      request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
       "local-preview";
     const dailyKey = `${new Date(now).toISOString().slice(0, 10)}:sko-review:${source}`;
     const digest = await crypto.subtle.digest(
@@ -114,13 +113,13 @@ export async function POST(request: Request) {
       name,
       rating,
       body,
-      language,
+      language: String(language) as "nl" | "en" | "fr",
       createdAt: now,
     };
     await env.DB.batch([
       env.DB.prepare(
         "INSERT INTO reviews (id, name, rating, body, language, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-      ).bind(review.id, name, rating, body, language, now),
+      ).bind(review.id, name, rating, body, review.language, now),
       env.DB.prepare(
         "DELETE FROM review_limits WHERE next_allowed_at < ?",
       ).bind(now - 86_400_000),
