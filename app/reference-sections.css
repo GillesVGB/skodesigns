@@ -1,0 +1,379 @@
+.reference-section {
+  padding-block: 70px 30px;
+}
+
+.reference-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  margin: 0 auto 35px;
+  text-align: center;
+}
+
+.reference-heading h2 {
+  color: var(--ink);
+  font-size: clamp(28px, 3.2vw, 38px);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.2;
+}
+
+.reference-heading > p {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.reference-heading > p::before,
+.reference-heading > p::after {
+  content: "";
+  width: 36px;
+  height: 1px;
+  background: color-mix(in srgb, var(--blue) 42%, transparent);
+}
+
+.reference-card {
+  background: var(--surface, #fff);
+  border: 1px solid color-mix(in srgb, var(--blue) 19%, transparent);
+  border-radius: 14px;
+  box-shadow: 0 10px 32px #12326d08;
+}
+
+.reference-team-card {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px 12px;
+  max-width: 570px;
+  margin: 0 auto;
+  padding: 22px 24px;
+}
+
+.reference-team-avatar {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 9px;
+  background: var(--soft);
+}
+
+.reference-team-name h3 {
+  font-size: 18px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.reference-team-name > p {
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.reference-team-bio {
+  grid-column: 1 / -1;
+  padding-top: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.reference-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  min-height: 35px;
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.reference-link:hover {
+  color: var(--deep);
+}
+
+.reference-link svg {
+  transition: transform 0.2s ease;
+}
+
+.reference-link:hover svg {
+  transform: translate(2px, -2px);
+}
+
+.reference-team-link {
+  grid-column: 1 / -1;
+  margin-top: 3px;
+}
+
+.reference-services {
+  max-width: 1120px;
+  padding-top: 75px;
+}
+
+.reference-service-wall {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+
+.reference-service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 19px;
+}
+
+.reference-service-copy h3 {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.reference-service-copy p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.reference-service-card > .reference-link {
+  margin-top: auto;
+}
+
+.reference-banner-card,
+.reference-emoji-card {
+  grid-column: 1 / -1;
+}
+
+.reference-banner-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 15px 20px;
+}
+
+.reference-banner-card > .reference-link {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+}
+
+.reference-banner-art {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--soft);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.reference-banner-art img {
+  width: 100%;
+  height: 190px;
+  object-fit: contain;
+}
+
+.reference-service-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  min-height: 140px;
+  height: 150px;
+  padding: 12px;
+  border-radius: 9px;
+  background: var(--soft);
+  overflow: hidden;
+}
+
+.reference-service-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.25s ease;
+}
+
+.reference-service-art:hover img {
+  transform: scale(1.025);
+}
+
+.reference-service-4 .reference-service-art {
+  background: #1045f5;
+  padding: 0;
+}
+
+.reference-service-0 .reference-service-art {
+  background: #f7f8fc;
+}
+
+.reference-service-4 .reference-service-art img {
+  width: auto;
+}
+
+.reference-service-3,
+.reference-service-2 {
+  justify-content: space-between;
+}
+
+.reference-emoji-card {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 23px;
+}
+
+.reference-emoji-card > .reference-link {
+  margin-top: 0;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.reference-contact-section {
+  padding-block: 85px 95px;
+}
+
+.reference-contact-card {
+  max-width: 640px;
+  padding: 45px 40px 48px;
+  margin: 0 auto;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 0, #1045f509, transparent 72%),
+    var(--surface, #fff);
+}
+
+.reference-contact-card h2 {
+  font-size: clamp(26px, 3.4vw, 35px);
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+}
+
+.reference-contact-card > p {
+  max-width: 40ch;
+  margin: 17px auto 25px;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.reference-contact-button {
+  border-radius: 11px;
+  min-height: 49px;
+  font-size: 13px;
+  padding: 14px 22px;
+}
+
+@media (max-width: 1000px) {
+  .reference-service-wall {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reference-service-art {
+    height: 180px;
+  }
+}
+
+@media (max-width: 680px) {
+  .reference-section {
+    padding-block: 48px 22px;
+  }
+
+  .reference-heading {
+    margin-bottom: 27px;
+    gap: 10px;
+  }
+
+  .reference-heading h2 {
+    font-size: 29px;
+  }
+
+  .reference-heading > p {
+    font-size: 12px;
+    gap: 9px;
+  }
+
+  .reference-heading > p::before,
+  .reference-heading > p::after {
+    width: 22px;
+  }
+
+  .reference-team-card {
+    padding: 19px;
+  }
+
+  .reference-team-bio {
+    font-size: 13px;
+  }
+
+  .reference-service-wall {
+    grid-template-columns: 1fr;
+    gap: 17px;
+  }
+
+  .reference-service-card {
+    padding: 19px;
+  }
+
+  .reference-banner-card {
+    display: flex;
+  }
+
+  .reference-banner-card > .reference-link {
+    align-self: flex-start;
+  }
+
+  .reference-banner-art img {
+    height: auto;
+    min-height: 115px;
+  }
+
+  .reference-service-art {
+    height: 175px;
+  }
+
+  .reference-emoji-card {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .reference-emoji-card > .reference-link {
+    align-self: flex-start;
+  }
+
+  .reference-contact-section {
+    padding-block: 55px 65px;
+  }
+
+  .reference-contact-card {
+    padding: 34px 23px 37px;
+  }
+
+  .reference-contact-card h2 {
+    font-size: 27px;
+  }
+
+  .reference-contact-card > p {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reference-link svg,
+  .reference-service-art img {
+    transition: none;
+  }
+}

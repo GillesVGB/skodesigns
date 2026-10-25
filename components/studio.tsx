@@ -1,6 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import DeviceMockups from "./device-mockups";
+import PublicReviews from "./public-reviews";
+import {
+  ReferenceAbout,
+  ReferenceServices,
+  ReferenceContact,
+} from "./reference-sections";
 import {
   boxCounts,
   boxPrices,
@@ -53,14 +60,13 @@ function Star() {
 function Logo({ d }: { d: Dictionary }) {
   return (
     <span className="brand-art">
-      <svg
+      <img
         className="wordmark"
-        viewBox="595 245 795 300"
-        role="img"
-        aria-label={d.ui.logoAlt}
-      >
-        <image href="/assets/sko-banner.webp" width="1983" height="793" />
-      </svg>
+        src="/assets/sko-logo-transparent.png"
+        width="2083"
+        height="755"
+        alt={d.ui.logoAlt}
+      />
       <img
         className="compact-mark"
         src="/assets/sko-icon.webp"
@@ -69,6 +75,65 @@ function Logo({ d }: { d: Dictionary }) {
         alt={d.ui.logoAlt}
       />
     </span>
+  );
+}
+function DiscordIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="currentColor"
+    >
+      <path d="M19.7 5.3a18 18 0 0 0-4.4-1.4l-.5 1a16 16 0 0 0-5.6 0l-.5-1a18 18 0 0 0-4.4 1.4C1.5 9.5.8 13.6 1.2 17.7a18 18 0 0 0 5.4 2.7l1.1-1.8-1.7-.9.4-.3a13 13 0 0 0 11.2 0l.4.3-1.7.9 1.1 1.8a18 18 0 0 0 5.4-2.7c.5-4.8-.8-8.9-3.1-12.4ZM8.5 14.9c-1.1 0-1.9-1-1.9-2.2s.8-2.2 1.9-2.2 1.9 1 1.9 2.2-.8 2.2-1.9 2.2Zm7 0c-1.1 0-1.9-1-1.9-2.2s.8-2.2 1.9-2.2 1.9 1 1.9 2.2-.8 2.2-1.9 2.2Z" />
+    </svg>
+  );
+}
+function ThemeToggle({ d }: { d: Dictionary }) {
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    let saved = false;
+    try {
+      saved = localStorage.getItem("sko-theme") === "dark";
+    } catch {}
+    setDark(saved);
+    document.documentElement.dataset.theme = saved ? "dark" : "light";
+  }, []);
+  const toggle = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.dataset.theme = next ? "dark" : "light";
+    try {
+      localStorage.setItem("sko-theme", next ? "dark" : "light");
+    } catch {}
+  };
+  return (
+    <button
+      className="theme-toggle"
+      onClick={toggle}
+      aria-label={dark ? d.ui.lightTheme : d.ui.darkTheme}
+      aria-pressed={dark}
+    >
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        aria-hidden="true"
+      >
+        {dark ? (
+          <>
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5" />
+          </>
+        ) : (
+          <path d="M20.5 13.2A8.5 8.5 0 0 1 10.8 3.5 8.5 8.5 0 1 0 20.5 13.2Z" />
+        )}
+      </svg>
+    </button>
   );
 }
 
@@ -181,6 +246,7 @@ function Navigation({
     "about",
     "reviews",
   ];
+  const primaryLinks: Page[] = ["home", "portfolio", "pricing"];
   return (
     <>
       <a href="#main" className="skip-link">
@@ -196,7 +262,7 @@ function Navigation({
             <Logo d={d} />
           </a>
           <nav className="desktop-links" aria-label={d.footer.navigation}>
-            {links.map((p) => (
+            {primaryLinks.map((p) => (
               <a
                 key={p}
                 href={route(lang, p)}
@@ -210,12 +276,15 @@ function Navigation({
             <div className="desktop-language">
               <LanguageSelector lang={lang} page={page} d={d} />
             </div>
+            <ThemeToggle d={d} />
             <a
-              className="button button-small nav-project"
-              href={route(lang, "contact")}
+              className="nav-discord"
+              href={discord}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${d.footer.social} (${d.ui.newTab})`}
             >
-              {d.ui.start}
-              <Arrow diagonal />
+              <DiscordIcon />
             </a>
             <button
               className="menu-toggle"
@@ -342,94 +411,46 @@ function PageHeading({
 
 function Hero({ lang, d }: { lang: Language; d: Dictionary }) {
   return (
-    <section className="hero container">
+    <section className="hero container reference-hero">
       <div className="hero-copy">
-        <p className="eyebrow">
-          <span className="blue-dot" />
+        <p className="eyebrow hero-badge">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            aria-hidden="true"
+          >
+            <path d="M12 3a9 9 0 1 0 0 18h1.2a2.3 2.3 0 0 0 2-3.4 1.2 1.2 0 0 1 1-1.8H18a3 3 0 0 0 3-3C21 7.4 16.8 3 12 3Z" />
+            <circle cx="7.5" cy="10" r=".8" />
+            <circle cx="11" cy="7" r=".8" />
+            <circle cx="15.5" cy="8.5" r=".8" />
+            <circle cx="7.5" cy="14" r=".8" />
+          </svg>
           {d.hero.eyebrow}
         </p>
         <h1>
-          {d.hero.line1} <br />
-          {d.hero.line2} <br />
-          <span>
-            {d.hero.accent}
-            <svg
-              viewBox="0 0 450 18"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M4 12C110 0 300 0 446 9"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-              />
-            </svg>
-          </span>
+          {d.hero.line1}
+          <span>{d.hero.accent}</span>
         </h1>
         <p className="hero-description">{d.hero.description}</p>
         <div className="hero-buttons">
-          <a href={route(lang, "portfolio")} className="button">
-            {d.ui.explore}
+          <a
+            href={discord}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="button"
+            aria-label={`${d.ui.contact} (${d.ui.newTab})`}
+          >
+            {d.ui.contact}
             <Arrow diagonal />
           </a>
-          <a href={route(lang, "contact")} className="text-link">
-            {d.ui.start}
-            <Arrow />
-          </a>
-        </div>
-        <p className="hero-note">
-          <span aria-hidden="true">↳</span>
-          {d.hero.note}
-        </p>
-      </div>
-      <div className="hero-composition">
-        <div className="art-grid" aria-hidden="true" />
-        <span className="composition-cross" aria-hidden="true">
-          +
-        </span>
-        <span className="composition-label">SKO / {d.band[1]}</span>
-        <div className="hero-square">
-          <img
-            src="/assets/sko-icon.webp"
-            width="640"
-            height="640"
-            alt={d.ui.logoAlt}
-            fetchPriority="high"
-          />
-          <span className="square-caption">Sko Designs / 01</span>
-        </div>
-        <div className="hero-banner">
-          <img
-            src="/assets/sko-banner.webp"
-            width="1983"
-            height="793"
-            alt={d.ui.logoAlt}
-            fetchPriority="high"
-          />
-        </div>
-        <div className="hero-thumbnail">
-          <img
-            src="/assets/your-vision.webp"
-            width="1024"
-            height="536"
-            alt="Your Vision, Our Design"
-          />
-        </div>
-        <div className="composition-stamp" aria-hidden="true">
-          <Star />
-        </div>
-        <div className="composition-footer">
-          <span>{d.hero.visual}</span>
-          <span aria-hidden="true">↗</span>
         </div>
       </div>
-      <div className="hero-bottom">
-        <span>{d.hero.index}</span>
-        <a href="#work">
-          {d.hero.scroll}
-          <span aria-hidden="true">↓</span>
-        </a>
+      <div className="hero-visual">
+        <DeviceMockups label={d.hero.devices} />
       </div>
     </section>
   );
@@ -716,10 +737,10 @@ function Portfolio({
 }
 
 const serviceAssets = [
-  "sko-icon.webp",
-  "sko-banner.webp",
+  "recent-05.webp",
+  "recent-04.webp",
   null,
-  null,
+  "recent-02.webp",
   "sko-v3-still.webp",
   null,
 ];
@@ -918,58 +939,13 @@ function About({
 
 function Reviews({
   lang,
-  d,
   full = false,
 }: {
   lang: Language;
   d: Dictionary;
   full?: boolean;
 }) {
-  const reviewItems = full
-    ? d.reviews.items
-    : [d.reviews.items[1], d.reviews.items[2], d.reviews.items[9]];
-  return (
-    <section className="reviews-section section-space">
-      <div className="container">
-        {!full && (
-          <div className="section-head">
-            <Intro
-              eyebrow={d.reviews.eyebrow}
-              title={d.reviews.title}
-              accent={d.reviews.accent}
-            />
-            <a className="text-link" href={route(lang, "reviews")}>
-              {d.reviews.all}
-              <Arrow diagonal />
-            </a>
-          </div>
-        )}
-        <div className="review-grid">
-          {reviewItems.map(([name, text]) => (
-            <figure className="review" key={name}>
-              <div className="review-stars" role="img" aria-label={d.ui.stars}>
-                ★★★★★
-              </div>
-              <blockquote>{text}</blockquote>
-              <figcaption>
-                <span className="review-avatar" aria-hidden="true">
-                  {name[0]}
-                </span>
-                <span>
-                  <strong>{name}</strong>
-                  <small>{d.reviews.source}</small>
-                </span>
-                <span className="quote-mark" aria-hidden="true">
-                  ”
-                </span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-        {full && <p className="review-source">{d.reviews.description}</p>}
-      </div>
-    </section>
-  );
+  return <PublicReviews lang={lang} full={full} />;
 }
 
 function Pricing({
@@ -1376,16 +1352,15 @@ export default function Studio({ lang, page }: { lang: Language; page: Page }) {
   return (
     <>
       <Navigation lang={lang} page={page} d={d} />
-      <main id="main" tabIndex={-1}>
+      <main id="main" className={`page-content page-${page}`} tabIndex={-1}>
         {page === "home" && (
           <>
             <Hero lang={lang} d={d} />
-            <BrandBand d={d} />
             <Portfolio lang={lang} d={d} />
-            <Services lang={lang} d={d} />
-            <About lang={lang} d={d} />
-            <Reviews lang={lang} d={d} />
-            <Pricing lang={lang} d={d} />
+            <ReferenceAbout lang={lang} d={d} />
+            <PublicReviews lang={lang} />
+            <ReferenceServices lang={lang} d={d} />
+            <ReferenceContact lang={lang} d={d} />
           </>
         )}
         {page === "portfolio" && (

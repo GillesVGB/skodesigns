@@ -1,3 +1,4 @@
+import { recentProjects } from "./recent-projects";
 export const languages = ["nl", "en", "fr"] as const;
 export type Language = (typeof languages)[number];
 export const pages = [
@@ -11,7 +12,7 @@ export const pages = [
   "privacy",
 ] as const;
 export type Page = (typeof pages)[number];
-export const discord = "https://discord.gg/zBPeuExUS3";
+export const discord = "https://discord.gg/skodesigns";
 export const canonicalOrigin = "https://thomdesigns.nl";
 export const languageNames = {
   nl: "Nederlands",
@@ -21,6 +22,7 @@ export const languageNames = {
 export const route = (lang: Language, page: Page = "home") =>
   `/${lang}/${page === "home" ? "" : page + "/"}`;
 export const projects = [
+  ...recentProjects,
   {
     id: "sko-identity",
     title: "Sko Designs",
@@ -28,7 +30,7 @@ export const projects = [
     image: "sko-icon.webp",
     width: 640,
     height: 640,
-    featured: true,
+    featured: false,
   },
   {
     id: "sko-banner",
@@ -37,7 +39,7 @@ export const projects = [
     image: "sko-banner.webp",
     width: 1983,
     height: 793,
-    featured: true,
+    featured: false,
   },
   {
     id: "sko-motion",
@@ -47,7 +49,7 @@ export const projects = [
     animation: "sko-v3.gif",
     width: 640,
     height: 640,
-    featured: true,
+    featured: false,
   },
   {
     id: "sko-white",
@@ -83,7 +85,7 @@ export const projects = [
     image: "your-vision.webp",
     width: 1024,
     height: 536,
-    featured: true,
+    featured: false,
   },
 ];
 export type Project = (typeof projects)[number];
@@ -173,14 +175,17 @@ const nl = {
     logoAlt: "Officieel Sko Design-logo",
     artAlt: "Origineel ontwerp uit het portfolio van Sko Designs",
     stars: "5 van 5 sterren",
+    lightTheme: "Lichte weergave",
+    darkTheme: "Donkere weergave",
   },
   hero: {
-    eyebrow: "CREATIEVE DESIGNSTUDIO",
-    line1: "Design dat",
-    line2: "jou laat",
-    accent: "opvallen.",
+    eyebrow: "GRAFISCH DESIGNER",
+    line1: "Graphics met",
+    line2: "",
+    accent: "karakter.",
+    devices: "Telefoon en laptop met het officiële Sko Design-logo",
     description:
-      "Creatieve graphics. Krachtige branding. Premium visuals die jouw merk onmogelijk te negeren maken.",
+      "Jouw visie. Ontworpen om op te vallen. Strakke graphics die jouw merk laten spreken.",
     note: "Voor creators, communities & merken met ambitie.",
     visual: "Jouw visie. Onze signatuur.",
     index: "01 / EEN EERSTE INDRUK DIE BLIJFT",
@@ -193,9 +198,9 @@ const nl = {
     "GEMAAKT OM OP TE VALLEN",
   ],
   work: {
-    eyebrow: "01 — HET WERK",
-    title: "Laat het werk",
-    accent: "spreken.",
+    eyebrow: "RECENT WERK",
+    title: "Recent",
+    accent: "werk.",
     description:
       "Van een herkenbaar logo tot een complete visuele wereld. Een selectie van onze designs.",
     pageTitle: "Werk dat blijft hangen.",
@@ -293,48 +298,10 @@ const nl = {
     title: "Mooi werk is één ding.",
     accent: "Fijn samenwerken ook.",
     description:
-      "Ervaringen van klanten, overgenomen van de bestaande website. Vertalingen behouden de betekenis van het origineel.",
+      "Ervaringen van klanten die hun review bij Sko Designs hebben geplaatst.",
     source: "Klantreview",
     all: "Lees alle reviews",
-    items: [
-      [
-        "CryzZ",
-        "Snelle, strakke en professionele designs. Gemaakt met precisie, creativiteit en oog voor detail om je merk te laten opvallen.",
-      ],
-      [
-        "Project Globe",
-        "De designs zijn ontzettend strak en professioneel. Alles ziet er verzorgd en goed in balans uit, precies zoals ik het me had voorgesteld.",
-      ],
-      [
-        "buyvolt.xyz",
-        "Snel en prettig samenwerken! De communicatie verliep soepel, het proces ging vlot en het eindresultaat was precies wat ik wilde.",
-      ],
-      ["Simon", "Een vertrouwd adres voor thumbnails van hoge kwaliteit."],
-      [
-        "Berry Bengel",
-        "Goede communicatie, snelle levering en geweldige kwaliteit. Alles werd professioneel aangepakt en het eindresultaat was zelfs beter dan verwacht.",
-      ],
-      [
-        "Yenzotjeuhhh",
-        "Supersnelle levering en echt betaalbare prijzen. De kwaliteit is eerlijk gezegd geweldig voor wat je betaalt. Zeker een aanrader, jongens.",
-      ],
-      [
-        "Ducky",
-        "Een van de makkelijkste designers om mee te werken. Hij begrijpt meteen wat je wilt, heeft oog voor detail en maakt van ideeën iets unieks en professioneels. Voor een nieuw ontwerp kom ik hier steeds terug.",
-      ],
-      [
-        "Fasnoo",
-        "Weer goed geholpen, zoals altijd. Stelt nooit teleur en levert precies wat ik nodig heb. Elke keer mijn vaste designer.",
-      ],
-      [
-        "Jorikkie",
-        "Echt onder de indruk van zijn creatieve en originele designs. Hij komt steeds met frisse ideeën en weet hoe een ontwerp opvalt. Zeker iemand die ik zou aanbevelen.",
-      ],
-      [
-        "Tonic",
-        "Mijn streamerpakket laten maken en ik ben er ontzettend blij mee. Alles past perfect bij elkaar, ziet er professioneel uit en geeft mijn stream een heel andere uitstraling.",
-      ],
-    ],
+    items: [],
   },
   pricing: {
     eyebrow: "05 — HELDER VANAF HET BEGIN",
@@ -444,11 +411,11 @@ const nl = {
   privacy: {
     title: "Privacy, helder uitgelegd.",
     intro:
-      "Deze website gebruikt geen advertentietrackers of analytische cookies.",
+      "Deze website gebruikt geen advertentietrackers of analytische cookies. Reviews die je zelf indient, worden openbaar getoond.",
     sections: [
       [
         "Taalvoorkeur",
-        "We bewaren alleen je gekozen taal (nl, en of fr) in de lokale opslag van je browser. Zo opent de website bij een volgend bezoek in jouw taal. Je kunt deze voorkeur wissen via je browserinstellingen.",
+        "We bewaren je gekozen taal (nl, en of fr) en lichte of donkere weergave lokaal in je browser. Een voorkeurcookie onthoudt je taal voor een volgend bezoek. Je kunt deze voorkeuren wissen via je browserinstellingen.",
       ],
       [
         "Contact via Discord",
@@ -457,6 +424,14 @@ const nl = {
       [
         "Pakketbouwer",
         "Je selectie en prijsindicatie blijven in je browser. Alleen als je op kopiëren drukt, wordt de tekst naar je klembord gekopieerd. Je kiest zelf wat je vervolgens via Discord deelt.",
+      ],
+      [
+        "Openbare reviews",
+        "Als je een review indient, bewaren en publiceren we je opgegeven naam, beoordeling, tekst en datum. We vragen geen e-mailadres. Je geeft hiervoor toestemming in het reviewformulier. Je tekst blijft in de taal waarin je die schrijft. Wil je je review laten verwijderen? Neem contact op via Discord.",
+      ],
+      [
+        "Spambescherming",
+        "Voor het beperken van misbruik gebruiken we kort bewaarde, dagelijks wisselende technische hashes. We slaan geen onversleutelde IP-adressen op.",
       ],
       [
         "Vragen",
@@ -546,14 +521,17 @@ const en: typeof nl = {
     logoAlt: "Official Sko Design logo",
     artAlt: "Original design from the Sko Designs portfolio",
     stars: "5 out of 5 stars",
+    lightTheme: "Switch to light mode",
+    darkTheme: "Switch to dark mode",
   },
   hero: {
-    eyebrow: "INDEPENDENT CREATIVE STUDIO",
-    line1: "Design that",
-    line2: "makes you",
-    accent: "stand out.",
+    eyebrow: "GRAPHICS DESIGNER",
+    line1: "Graphics that look",
+    line2: "",
+    accent: "intentional.",
+    devices: "Phone and laptop displaying the official Sko Design logo",
     description:
-      "Creative graphics. Powerful branding. Premium visuals designed to make your brand impossible to ignore.",
+      "Your vision. Designed to stand out. Clean graphics that make your brand pop.",
     note: "For creators, communities & brands with ambition.",
     visual: "Your vision. Our signature.",
     index: "01 / A FIRST IMPRESSION THAT LASTS",
@@ -566,9 +544,9 @@ const en: typeof nl = {
     "MADE TO STAND OUT",
   ],
   work: {
-    eyebrow: "01 — SELECTED WORK",
-    title: "Let the work",
-    accent: "do the talking.",
+    eyebrow: "RECENT WORK",
+    title: "Recent",
+    accent: "work.",
     description:
       "From a distinctive logo to a complete visual world. A selection of our designs.",
     pageTitle: "Work that stays with you.",
@@ -669,48 +647,10 @@ const en: typeof nl = {
     title: "Great design is one thing.",
     accent: "Working well together matters too.",
     description:
-      "Client experiences from the existing website. Translations preserve the meaning of the original reviews.",
+      "Experiences shared by clients who have posted a review with Sko Designs.",
     source: "Client review",
     all: "Read all reviews",
-    items: [
-      [
-        "CryzZ",
-        "Fast, clean and professional designs. Crafted with precision, creativity and attention to detail to make your brand stand out.",
-      ],
-      [
-        "Project Globe",
-        "The designs are incredibly clean and professional. Everything looks polished, well-balanced, and exactly how I imagined it.",
-      ],
-      [
-        "buyvolt.xyz",
-        "Fast and easy to deal with! The communication was smooth, the process was quick, and the final design turned out exactly how I wanted it.",
-      ],
-      ["Simon", "A trusted name for high-quality thumbnail designs."],
-      [
-        "Berry Bengel",
-        "Great communication, fast delivery, and amazing quality. Everything was handled professionally, the communication was smooth, and the final design turned out even better than I expected.",
-      ],
-      [
-        "Yenzotjeuhhh",
-        "Super fast delivery and really affordable prices. The quality is honestly great for what you pay, definitely recommend checking him out, boys.",
-      ],
-      [
-        "Ducky",
-        "Honestly one of the easiest designers to work with. He understands what you want right away, has a great eye for detail, and always manages to turn ideas into something unique and professional. I always come back here whenever I need a new design.",
-      ],
-      [
-        "Fasnoo",
-        "Sorted again, as always. Never disappoints and always delivers exactly what I need. Definitely my go-to designer every time.",
-      ],
-      [
-        "Jorikkie",
-        "Really impressed with how creative and original his designs are. He always brings a fresh idea to the table and knows exactly how to make a design stand out. Definitely someone I’d recommend.",
-      ],
-      [
-        "Tonic",
-        "Got my streamer package done and I couldn’t be happier with it. Everything matches perfectly, looks professional, and gives my stream a completely different feel. Definitely happy with how it turned out!",
-      ],
-    ],
+    items: [],
   },
   pricing: {
     eyebrow: "05 — CLEAR FROM THE START",
@@ -820,11 +760,12 @@ const en: typeof nl = {
   },
   privacy: {
     title: "Privacy, clearly explained.",
-    intro: "This website uses no advertising trackers or analytics cookies.",
+    intro:
+      "This website uses no advertising trackers or analytics cookies. Reviews you submit are displayed publicly.",
     sections: [
       [
         "Language preference",
-        "We only store your selected language (nl, en or fr) in your browser’s local storage. This lets the website open in your preferred language next time. You can remove this preference in your browser settings.",
+        "Your selected language (nl, en or fr) and light or dark theme are saved locally in your browser. A preference cookie remembers your language for return visits. You can remove these preferences in your browser settings.",
       ],
       [
         "Contact through Discord",
@@ -833,6 +774,14 @@ const en: typeof nl = {
       [
         "Package builder",
         "Your selection and estimate stay in your browser. Text is only copied to your clipboard when you press copy. You decide what to share on Discord afterwards.",
+      ],
+      [
+        "Public reviews",
+        "When you submit a review, we store and publish your display name, rating, text and date. We do not request an email address. You consent to this in the review form. Your text stays in the language you write it in. To request removal, contact us on Discord.",
+      ],
+      [
+        "Spam protection",
+        "To limit abuse, we keep short-lived technical hashes that rotate daily. We do not store raw IP addresses.",
       ],
       [
         "Questions",
@@ -922,14 +871,17 @@ const fr: typeof nl = {
     logoAlt: "Logo officiel Sko Design",
     artAlt: "Création originale du portfolio de Sko Designs",
     stars: "5 étoiles sur 5",
+    lightTheme: "Passer au thème clair",
+    darkTheme: "Passer au thème sombre",
   },
   hero: {
-    eyebrow: "STUDIO DE DESIGN CRÉATIF",
-    line1: "Le design",
-    line2: "qui vous",
-    accent: "distingue.",
+    eyebrow: "DESIGNER GRAPHIQUE",
+    line1: "Des visuels",
+    line2: "",
+    accent: "qui marquent.",
+    devices: "Téléphone et ordinateur affichant le logo officiel Sko Design",
     description:
-      "Des graphismes créatifs. Une identité forte. Des visuels soignés pour une marque impossible à ignorer.",
+      "Votre vision. Un design qui se démarque. Des graphismes soignés qui donnent vie à votre marque.",
     note: "Pour les créateurs, communautés et marques ambitieuses.",
     visual: "Votre vision. Notre signature.",
     index: "01 / UNE PREMIÈRE IMPRESSION DURABLE",
@@ -942,9 +894,9 @@ const fr: typeof nl = {
     "POUR SE DÉMARQUER",
   ],
   work: {
-    eyebrow: "01 — NOS CRÉATIONS",
-    title: "Laissons parler",
-    accent: "les créations.",
+    eyebrow: "CRÉATIONS RÉCENTES",
+    title: "Créations",
+    accent: "récentes.",
     description:
       "D’un logo distinctif à un univers visuel complet. Une sélection de nos créations.",
     pageTitle: "Des créations qui marquent.",
@@ -1046,51 +998,10 @@ const fr: typeof nl = {
     title: "Un beau design compte.",
     accent: "Une belle collaboration aussi.",
     description:
-      "Témoignages issus du site existant. Les traductions préservent le sens des avis originaux.",
+      "Les expériences des clients ayant publié un avis chez Sko Designs.",
     source: "Avis client",
     all: "Lire tous les avis",
-    items: [
-      [
-        "CryzZ",
-        "Des créations rapides, soignées et professionnelles. Réalisées avec précision, créativité et souci du détail pour faire ressortir votre marque.",
-      ],
-      [
-        "Project Globe",
-        "Les créations sont incroyablement soignées et professionnelles. Tout est abouti, bien équilibré et exactement comme je l’imaginais.",
-      ],
-      [
-        "buyvolt.xyz",
-        "Rapide et très agréable ! La communication était fluide, le processus rapide et le résultat correspondait exactement à mes attentes.",
-      ],
-      [
-        "Simon",
-        "Une référence de confiance pour des miniatures de grande qualité.",
-      ],
-      [
-        "Berry Bengel",
-        "Une excellente communication, une livraison rapide et une qualité remarquable. Tout a été géré avec professionnalisme et le résultat était encore meilleur que prévu.",
-      ],
-      [
-        "Yenzotjeuhhh",
-        "Une livraison super rapide et des prix vraiment abordables. La qualité est excellente pour le prix payé. Je vous le recommande, les gars.",
-      ],
-      [
-        "Ducky",
-        "L’un des designers avec qui il est le plus facile de travailler. Il comprend tout de suite vos attentes, a le souci du détail et transforme les idées en créations uniques et professionnelles. Je reviens toujours ici pour un nouveau design.",
-      ],
-      [
-        "Fasnoo",
-        "Encore bien servi, comme toujours. Jamais déçu, il livre exactement ce dont j’ai besoin. Mon designer de référence à chaque fois.",
-      ],
-      [
-        "Jorikkie",
-        "Vraiment impressionné par sa créativité et l’originalité de ses créations. Il apporte toujours des idées nouvelles et sait comment faire ressortir un design. Je le recommande sans hésiter.",
-      ],
-      [
-        "Tonic",
-        "J’ai fait réaliser mon pack streamer et je suis ravi du résultat. Tout s’accorde parfaitement, le rendu est professionnel et donne une tout autre ambiance à mon stream. Très satisfait !",
-      ],
-    ],
+    items: [],
   },
   pricing: {
     eyebrow: "05 — CLAIR DÈS LE DÉPART",
@@ -1200,11 +1111,12 @@ const fr: typeof nl = {
   },
   privacy: {
     title: "La confidentialité, simplement.",
-    intro: "Ce site n’utilise aucun traceur publicitaire ni cookie analytique.",
+    intro:
+      "Ce site n’utilise aucun traceur publicitaire ni cookie analytique. Les avis que vous publiez sont affichés publiquement.",
     sections: [
       [
         "Préférence linguistique",
-        "Nous conservons uniquement la langue choisie (nl, en ou fr) dans le stockage local de votre navigateur. Le site pourra ainsi s’ouvrir dans votre langue lors de votre prochaine visite. Vous pouvez supprimer cette préférence dans les paramètres du navigateur.",
+        "Votre langue (nl, en ou fr) et le thème clair ou sombre sont enregistrés dans votre navigateur. Un cookie de préférence mémorise votre langue pour vos prochaines visites. Vous pouvez supprimer ces préférences dans les paramètres du navigateur.",
       ],
       [
         "Contact via Discord",
@@ -1213,6 +1125,14 @@ const fr: typeof nl = {
       [
         "Configurateur de pack",
         "Votre sélection et l’estimation restent dans votre navigateur. Le texte est copié dans votre presse-papiers uniquement lorsque vous appuyez sur copier. Vous choisissez ensuite ce que vous partagez sur Discord.",
+      ],
+      [
+        "Avis publics",
+        "Lorsque vous publiez un avis, nous enregistrons et affichons votre nom public, votre note, votre texte et la date. Aucune adresse e-mail n’est demandée. Le formulaire recueille votre consentement. Votre texte reste dans sa langue d’origine. Pour demander sa suppression, contactez-nous sur Discord.",
+      ],
+      [
+        "Protection contre le spam",
+        "Nous conservons brièvement des empreintes techniques renouvelées chaque jour pour limiter les abus. Aucune adresse IP brute n’est enregistrée.",
       ],
       [
         "Questions",
