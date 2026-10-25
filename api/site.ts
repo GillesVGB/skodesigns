@@ -8,7 +8,8 @@ async function handle(request: Request) {
   for(const [key,value]of incoming.searchParams)if(key!=="path")upstream.searchParams.append(key,value);
   const headers=new Headers(request.headers);
   for(const name of ["host","connection","content-length","transfer-encoding","authorization","oai-authenticated-user-id","oai-authenticated-user-email","x-sko-forwarded-origin","x-sko-proxy-secret","x-sko-client-ip"])headers.delete(name);
-  headers.set("OAI-Sites-Authorization",token);
+  // Sites dispatch expects an explicit bearer scheme for its private bypass token.
+  headers.set("OAI-Sites-Authorization",`Bearer ${token.replace(/^Bearer\s+/i,"")}`);
   headers.set("X-Sko-Proxy-Secret",secret);
   headers.set("X-Sko-Forwarded-Origin",incoming.origin);
   const clientIp=(request.headers.get("x-vercel-forwarded-for")||request.headers.get("x-forwarded-for")||"").split(",")[0].trim();
