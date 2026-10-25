@@ -137,27 +137,29 @@ const database = {
 const bucket = {
   async put(key: string, body: Uint8Array, options: { httpMetadata?: { contentType?: string } }) {
     const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token) throw new Error("BLOB_READ_WRITE_TOKEN is not configured.");
     return put(key, Buffer.from(body), {
       access: "private",
       addRandomSuffix: false,
       contentType: options.httpMetadata?.contentType,
-      token,
+      ...(token ? { token } : {}),
     });
   },
   async head(key: string) {
     const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token) return null;
+    if (!token && !process.env.BLOB_STORE_ID) return null;
     try {
-      return await head(key, { token });
+      return await head(key, token ? { token } : {});
     } catch {
       return null;
     }
   },
   async get(key: string) {
     const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token) return null;
-    const blob = await get(key, { access: "private", token });
+    if (!token && !process.env.BLOB_STORE_ID) return null;
+    const blob = await get(key, {
+      access: "private",
+      ...(token ? { token } : {}),
+    });
     return blob && blob.statusCode === 200
       ? {
           body: blob.stream,
@@ -172,7 +174,9 @@ export const env = {
     return getClient() ? database : undefined;
   },
   get BUCKET() {
-    return process.env.BLOB_READ_WRITE_TOKEN ? bucket : undefined;
+    return process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID
+      ? bucket
+      : undefined;
   },
   get DISCORD_CLIENT_ID() {
     return process.env.DISCORD_CLIENT_ID;

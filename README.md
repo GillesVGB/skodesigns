@@ -33,7 +33,7 @@ Open `http://127.0.0.1:5174`. Build with `npm run build`.
 
 The configured server is `1562896437082071090`, the staff role is `1563635614287663185` and the Discord application is `1564008974720958464`. The application requests only `identify` and `guilds.members.read`; no bot token is needed.
 
-Required variables are `DATABASE_URL` (or the Vercel integration's `POSTGRES_URL`), `BLOB_READ_WRITE_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_GUILD_ID` and `DISCORD_STAFF_ROLE_ID`. Add them to the Vercel project for Production (and Preview if you use previews). For local development, store them in the ignored `.env.local` file. Never commit that file.
+Required variables are `DATABASE_URL` (or the Vercel integration's `POSTGRES_URL`), `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET`. Connect a private Blob store to the same Vercel project; new OIDC-backed stores provide `BLOB_STORE_ID` and short-lived authentication automatically, while token-based stores use `BLOB_READ_WRITE_TOKEN`. The guild and staff role IDs default to the values above, but may be overridden with `DISCORD_GUILD_ID` and `DISCORD_STAFF_ROLE_ID`. Add all required variables to Production (and Preview if you use previews). For local development, store them in the ignored `.env.local` file. Never commit secrets.
 
 Required Discord OAuth redirects to register in the application settings:
 
