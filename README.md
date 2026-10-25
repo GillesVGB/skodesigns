@@ -15,7 +15,7 @@ Open the Local URL printed by the server. Build with `npm run build`. The Sites 
 
 ## Content and design
 
-- `lib/content.ts`: Dutch, English and French dictionaries, prices in euro cents, project catalogue and verified Discord invite.
+- `lib/content.ts`: Dutch, English and French dictionaries, prices in euro cents, project catalogue and verified Discord invite. English is the first-visit default; language selections persist between visits.
 - `components/studio.tsx`: navigation, language switcher, gallery/lightbox, services, team, reviews, pricing calculator, contact and footer.
 - `app/globals.css`: shared design tokens, responsive layouts, reduced-motion styles and interaction states.
 - `app/[lang]/[[...slug]]/page.tsx`: nine public pages plus a protected staff page per language, translated metadata, canonical URLs and hreflang. Admin routes are excluded from the sitemap and marked noindex.

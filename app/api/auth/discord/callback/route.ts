@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const [savedState, savedLang] = cookie(request, "sko-oauth").split(":");
-  const lang = ["nl", "en", "fr"].includes(savedLang) ? savedLang : "nl";
+  const lang = ["nl", "en", "fr"].includes(savedLang) ? savedLang : "en";
   const finish = (result: string, sessionCookie?: string) => {
     const headers = new Headers({
       Location: new URL(`/${lang}/admin/?login=${result}`, publicOrigin(request)).href,

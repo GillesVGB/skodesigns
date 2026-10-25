@@ -15,7 +15,7 @@ export function proxy(request: NextRequest) {
     ].includes(path.replace(/\/$/, ""))
   ) {
     const saved = request.cookies.get("sko-language")?.value;
-    const lang = saved && ["nl", "en", "fr"].includes(saved) ? saved : "nl";
+    const lang = saved && ["nl", "en", "fr"].includes(saved) ? saved : "en";
     const url = request.nextUrl.clone();
     url.pathname = `/${lang}${path}`;
     return NextResponse.redirect(url);
@@ -24,7 +24,7 @@ export function proxy(request: NextRequest) {
   const language = request.nextUrl.pathname.split("/")[1];
   headers.set(
     "x-sko-language",
-    ["nl", "en", "fr"].includes(language) ? language : "nl",
+    ["nl", "en", "fr"].includes(language) ? language : "en",
   );
   const response = NextResponse.next({ request: { headers } });
   response.headers.set("X-Content-Type-Options", "nosniff");

@@ -8,8 +8,8 @@ import {
 } from "@/lib/staff-auth";
 export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
-  const lang = new URL(request.url).searchParams.get("lang") || "nl";
-  const locale = ["nl", "en", "fr"].includes(lang) ? lang : "nl";
+  const lang = new URL(request.url).searchParams.get("lang") || "en";
+  const locale = ["nl", "en", "fr"].includes(lang) ? lang : "en";
   if (!configured())
     return Response.redirect(
       new URL(`/${locale}/admin/?login=setup`, publicOrigin(request)),

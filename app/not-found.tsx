@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { dictionaries, route, type Language } from "@/lib/content";
 export default async function NotFound() {
-  const value = (await headers()).get("x-sko-language") || "nl";
-  const lang = (["nl", "en", "fr"].includes(value) ? value : "nl") as Language;
+  const value = (await headers()).get("x-sko-language") || "en";
+  const lang = (["nl", "en", "fr"].includes(value) ? value : "en") as Language;
   const d = dictionaries[lang];
   return (
     <main className="not-found container">

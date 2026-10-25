@@ -7,7 +7,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const language = (await headers()).get("x-sko-language") || "nl";
+  const language = (await headers()).get("x-sko-language") || "en";
   return (
     <html lang={language} suppressHydrationWarning>
       <body>{children}</body>
