@@ -42,8 +42,7 @@ export default function Admin({ lang }: { lang: Language }) {
       title: string;
     } | null>(null),
     [preview, setPreview] = useState(""),
-    [editing, setEditing] = useState<PricingItem | null>(null),
-    [attempt, setAttempt] = useState(0);
+    [editing, setEditing] = useState<PricingItem | null>(null);
   const [undo, setUndo] = useState<{
     collection: "portfolio" | "store";
     id: string;
@@ -54,6 +53,8 @@ export default function Admin({ lang }: { lang: Language }) {
     setError(
       reason === "setup"
         ? t.setup
+        : reason === "database"
+          ? t.databaseSetup
         : ["unauthorized", "forbidden"].includes(reason)
           ? t.sessionExpired
           : reason === "tooLarge"
@@ -74,7 +75,6 @@ export default function Admin({ lang }: { lang: Language }) {
   }
   useEffect(() => {
     let active = true;
-    setLoading(true);
     fetch("/api/admin/session/", { cache: "no-store" })
       .then(async (response) => {
         const data = (await response.json()) as {
@@ -95,6 +95,7 @@ export default function Admin({ lang }: { lang: Language }) {
         const result = new URLSearchParams(location.search).get("login");
         if (result === "denied") setError(t.denied);
         if (result === "error") setError(t.loginError);
+        if (result === "database") setError(t.databaseSetup);
       })
       .catch((e) => {
         if (active) failure(e.message);
@@ -105,7 +106,7 @@ export default function Admin({ lang }: { lang: Language }) {
     return () => {
       active = false;
     };
-  }, [attempt, lang]);
+  }, [lang]);
   useEffect(
     () => () => {
       if (preview) URL.revokeObjectURL(preview);

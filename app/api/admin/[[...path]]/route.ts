@@ -17,8 +17,11 @@ const parts = (r: Request) =>
 export async function GET(request: Request) {
   try {
     const [operation] = parts(request);
-    if (operation === "session" && !configured())
-      return json({ configured: false, user: null });
+    if (operation === "session") {
+      if (!configured()) return json({ configured: false, user: null });
+      if (!env.DB)
+        return json({ configured: true, user: null, error: "database" }, 503);
+    }
     const staff = await requireStaff(request);
     if (staff instanceof Response) {
       if (operation === "session" && staff.status === 401)

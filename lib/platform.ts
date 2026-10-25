@@ -24,9 +24,12 @@ let client: ReturnType<typeof postgres> | undefined;
 let schemaReady: Promise<void> | undefined;
 
 function getClient() {
-  // Vercel Marketplace Postgres providers commonly expose POSTGRES_URL; keep
-  // DATABASE_URL as the portable name for local and custom integrations.
-  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  // Keep a dedicated Supabase variable ahead of provider-managed URLs so a
+  // Vercel Postgres integration can remain available as a rollback target.
+  const url =
+    process.env.SUPABASE_DATABASE_URL ||
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL;
   if (!url) return undefined;
   if (!client) {
     client = postgres(url, {
@@ -34,6 +37,7 @@ function getClient() {
       idle_timeout: 20,
       connect_timeout: 10,
       prepare: false,
+      ssl: "require",
     });
   }
   return client;
@@ -108,7 +112,10 @@ async function runQuery(
   statement: PreparedStatement,
 ) {
   const db = getClient();
-  if (!db) throw new Error("DATABASE_URL or POSTGRES_URL is not configured.");
+  if (!db)
+    throw new Error(
+      "SUPABASE_DATABASE_URL, DATABASE_URL or POSTGRES_URL is not configured.",
+    );
   await ensureSchema(db);
   return statement.execute(run);
 }
@@ -119,7 +126,10 @@ const database = {
   },
   async batch(statements: PreparedStatement[]) {
     const db = getClient();
-    if (!db) throw new Error("DATABASE_URL or POSTGRES_URL is not configured.");
+    if (!db)
+      throw new Error(
+        "SUPABASE_DATABASE_URL, DATABASE_URL or POSTGRES_URL is not configured.",
+      );
     await ensureSchema(db);
     return db.begin(async (tx) => {
       const results = [];
@@ -194,6 +204,9 @@ export const env = {
 
 export function getDb() {
   const db = getClient();
-  if (!db) throw new Error("Set DATABASE_URL or POSTGRES_URL to connect the Vercel database.");
+  if (!db)
+    throw new Error(
+      "Set SUPABASE_DATABASE_URL, DATABASE_URL or POSTGRES_URL to connect the database.",
+    );
   return db;
 }

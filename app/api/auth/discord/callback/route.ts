@@ -27,7 +27,8 @@ export async function GET(request: Request) {
     if (sessionCookie) headers.append("Set-Cookie", sessionCookie);
     return new Response(null, { status: 303, headers });
   };
-  if (!configured() || !env.DB) return finish("setup");
+  if (!configured()) return finish("setup");
+  if (!env.DB) return finish("database");
   if (
     !savedState ||
     !/^[a-f0-9]{64}$/.test(savedState) ||

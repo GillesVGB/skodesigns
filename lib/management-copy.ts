@@ -9,7 +9,9 @@ const nl = {
   loginDescription:
     "Log in met Discord. Je krijgt alleen toegang als je de ingestelde staffrol in de Sko Designs-server hebt.",
   setup:
-    "Discord-login is nog niet ingesteld. De Discord-app moet eerst worden gekoppeld door de websitebeheerder.",
+    "Discord-login is niet beschikbaar op deze deployment. Controleer DISCORD_CLIENT_ID en DISCORD_CLIENT_SECRET bij Vercel → Project Settings → Environment Variables voor Production en maak daarna een nieuwe deployment.",
+  databaseSetup:
+    "De databaseverbinding ontbreekt. Voeg SUPABASE_DATABASE_URL toe bij Vercel → Project Settings → Environment Variables voor Production en maak daarna een nieuwe deployment.",
   denied:
     "Je hebt geen toegang met dit Discord-account. Controleer of je de staffrol in de juiste server hebt.",
   loginError: "Inloggen is niet gelukt. Probeer het opnieuw.",
@@ -82,7 +84,9 @@ const en: typeof nl = {
   loginDescription:
     "Sign in with Discord. Access is limited to members with the configured staff role in the Sko Designs server.",
   setup:
-    "Discord sign-in is not configured yet. The website administrator needs to connect the Discord application first.",
+    "Discord sign-in is unavailable on this deployment. Check DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET under Vercel → Project Settings → Environment Variables for Production, then create a new deployment.",
+  databaseSetup:
+    "The database connection is missing. Add SUPABASE_DATABASE_URL under Vercel → Project Settings → Environment Variables for Production, then create a new deployment.",
   denied:
     "This Discord account does not have access. Check that you have the staff role in the correct server.",
   loginError: "Sign-in failed. Please try again.",
@@ -156,7 +160,9 @@ const fr: typeof nl = {
   loginDescription:
     "Connectez-vous avec Discord. L’accès est réservé aux membres disposant du rôle d’équipe configuré sur le serveur Sko Designs.",
   setup:
-    "La connexion Discord n’est pas encore configurée. L’administrateur du site doit d’abord connecter l’application Discord.",
+    "La connexion Discord n’est pas disponible sur ce déploiement. Vérifiez DISCORD_CLIENT_ID et DISCORD_CLIENT_SECRET dans Vercel → Project Settings → Environment Variables pour Production, puis créez un nouveau déploiement.",
+  databaseSetup:
+    "La connexion à la base de données est absente. Ajoutez SUPABASE_DATABASE_URL dans Vercel → Project Settings → Environment Variables pour Production, puis créez un nouveau déploiement.",
   denied:
     "Ce compte Discord n’a pas accès à cet espace. Vérifiez votre rôle sur le bon serveur.",
   loginError: "La connexion a échoué. Veuillez réessayer.",
