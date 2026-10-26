@@ -52,8 +52,9 @@ export async function GET(request: Request) {
 }
 export async function POST(request: Request) {
   if (!sameOrigin(request)) return json({ error: "forbidden" }, 403);
+  let operation = "";
   try {
-    const [operation] = parts(request);
+    [operation] = parts(request);
     if (operation === "logout") {
       const token = cookie(request, "sko-admin");
       if (env.DB && token)
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
     const staff = await requireStaff(request);
     if (staff instanceof Response) return staff;
     if (operation === "upload") {
-      if (!env.BUCKET) return json({ error: "unavailable" }, 503);
+      if (!env.BUCKET) return json({ error: "storage" }, 503);
       if (
         !request.headers.get("Content-Type")?.startsWith("multipart/form-data")
       )
@@ -136,12 +137,17 @@ export async function POST(request: Request) {
     const category = String(data.category);
     const width = Number(data.width);
     const height = Number(data.height);
-    if (
-      image &&
-      (!/^\/api\/media\/[a-f0-9-]{36}\.(png|jpg|webp)\/$/.test(image) ||
-        !(await env.BUCKET?.head(image.split("/")[3])))
-    )
-      return json({ error: "invalidImage" }, 400);
+    if (image) {
+      if (!/^\/api\/media\/[a-f0-9-]{36}\.(png|jpg|webp)\/$/.test(image))
+        return json({ error: "invalidImage" }, 400);
+      if (!env.BUCKET) return json({ error: "storage" }, 503);
+      try {
+        if (!(await env.BUCKET.head(image.split("/")[3])))
+          return json({ error: "storage" }, 503);
+      } catch {
+        return json({ error: "storage" }, 503);
+      }
+    }
     const id =
       operation === "store" &&
       typeof data.id === "string" &&
@@ -230,14 +236,17 @@ export async function POST(request: Request) {
     const invalid =
       error instanceof Error &&
       ["tooLarge", "invalidImage"].includes(error.message);
+    const code = invalid
+      ? error instanceof Error
+        ? error.message
+        : "invalid"
+      : error instanceof SyntaxError
+        ? "invalid"
+        : operation === "upload"
+          ? "storage"
+          : "database";
     return json(
-      {
-        error: invalid
-          ? error.message
-          : error instanceof SyntaxError
-            ? "invalid"
-            : "unavailable",
-      },
+      { error: code },
       invalid || error instanceof SyntaxError ? 400 : 503,
     );
   }

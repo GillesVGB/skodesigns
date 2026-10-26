@@ -12,6 +12,8 @@ const nl = {
     "Discord-login is niet beschikbaar op deze deployment. Controleer DISCORD_CLIENT_ID en DISCORD_CLIENT_SECRET bij Vercel → Project Settings → Environment Variables voor Production en maak daarna een nieuwe deployment.",
   databaseSetup:
     "De databaseverbinding ontbreekt. Voeg SUPABASE_DATABASE_URL toe bij Vercel → Project Settings → Environment Variables voor Production en maak daarna een nieuwe deployment.",
+  storageSetup:
+    "Supabase-afbeeldingenopslag is niet ingesteld of de upload is mislukt. Controleer SUPABASE_URL en SUPABASE_SECRET_KEY bij Vercel → Project Settings → Environment Variables voor Production. De secret key mag geen NEXT_PUBLIC_-prefix hebben. Start daarna een nieuwe deployment.",
   denied:
     "Je hebt geen toegang met dit Discord-account. Controleer of je de staffrol in de juiste server hebt.",
   loginError: "Inloggen is niet gelukt. Probeer het opnieuw.",
@@ -87,6 +89,8 @@ const en: typeof nl = {
     "Discord sign-in is unavailable on this deployment. Check DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET under Vercel → Project Settings → Environment Variables for Production, then create a new deployment.",
   databaseSetup:
     "The database connection is missing. Add SUPABASE_DATABASE_URL under Vercel → Project Settings → Environment Variables for Production, then create a new deployment.",
+  storageSetup:
+    "Supabase image storage is not configured or the upload failed. Check SUPABASE_URL and SUPABASE_SECRET_KEY under Vercel → Project Settings → Environment Variables for Production. The secret key must not have a NEXT_PUBLIC_ prefix. Then redeploy.",
   denied:
     "This Discord account does not have access. Check that you have the staff role in the correct server.",
   loginError: "Sign-in failed. Please try again.",
@@ -163,6 +167,8 @@ const fr: typeof nl = {
     "La connexion Discord n’est pas disponible sur ce déploiement. Vérifiez DISCORD_CLIENT_ID et DISCORD_CLIENT_SECRET dans Vercel → Project Settings → Environment Variables pour Production, puis créez un nouveau déploiement.",
   databaseSetup:
     "La connexion à la base de données est absente. Ajoutez SUPABASE_DATABASE_URL dans Vercel → Project Settings → Environment Variables pour Production, puis créez un nouveau déploiement.",
+  storageSetup:
+    "Le stockage des images Supabase n’est pas configuré ou le téléversement a échoué. Vérifiez SUPABASE_URL et SUPABASE_SECRET_KEY dans Vercel → Project Settings → Environment Variables pour Production. La clé secrète ne doit pas avoir de préfixe NEXT_PUBLIC_. Puis redéployez.",
   denied:
     "Ce compte Discord n’a pas accès à cet espace. Vérifiez votre rôle sur le bon serveur.",
   loginError: "La connexion a échoué. Veuillez réessayer.",

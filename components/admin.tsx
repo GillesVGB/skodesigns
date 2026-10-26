@@ -55,6 +55,8 @@ export default function Admin({ lang }: { lang: Language }) {
         ? t.setup
         : reason === "database"
           ? t.databaseSetup
+          : reason === "storage"
+            ? t.storageSetup
         : ["unauthorized", "forbidden"].includes(reason)
           ? t.sessionExpired
           : reason === "tooLarge"
