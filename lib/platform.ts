@@ -1,4 +1,5 @@
-import { Buffer } from "node:buffer";
+import "server-only";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import postgres from "postgres";
 
 type QueryRows = postgres.Row[] & { count: number };
@@ -138,6 +139,34 @@ const database = {
   },
 };
 
+let storageClient: SupabaseClient | undefined;
+let bucketSetup: Promise<void> | undefined;
+
+function getStorageClient() {
+  const config = supabaseStorageConfig();
+  if (!config) return undefined;
+  if (!storageClient) {
+    storageClient = createClient(config.url, config.key, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    });
+  }
+  return storageClient;
+}
+
+function storageError(operation: string, error: unknown) {
+  const status =
+    typeof error === "object" && error !== null && "status" in error
+      ? String(error.status)
+      : typeof error === "object" && error !== null && "statusCode" in error
+        ? String(error.statusCode)
+        : "unknown";
+  return new Error(`Supabase Storage ${operation} failed (${status}).`);
+}
+
 const bucket = {
   async put(
     key: string,
@@ -145,43 +174,44 @@ const bucket = {
     options: { httpMetadata?: { contentType?: string } },
   ) {
     await ensureSupabaseBucket();
-    const response = await supabaseStorageRequest(
-      `/object/${encodeURIComponent(storageBucketName())}/${encodeURIComponent(key)}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": options.httpMetadata?.contentType || "application/octet-stream",
-          "Cache-Control": "max-age=3600",
-        },
-        body: Buffer.from(body),
-      },
-    );
-    if (!response.ok)
-      throw new Error(`Supabase Storage upload failed (${response.status}).`);
+    const client = getStorageClient();
+    if (!client) throw new Error("Supabase Storage is not configured.");
+    const { error } = await client.storage
+      .from(storageBucketName())
+      .upload(key, body, {
+        contentType:
+          options.httpMetadata?.contentType || "application/octet-stream",
+        cacheControl: "3600",
+        upsert: false,
+      });
+    if (error) throw storageError("upload", error);
   },
   async head(key: string) {
-    const response = await supabaseStorageRequest(
-      `/object/${encodeURIComponent(storageBucketName())}/${encodeURIComponent(key)}`,
-      { method: "HEAD" },
-    );
-    if (response.status === 404) return null;
-    if (!response.ok)
-      throw new Error(`Supabase Storage check failed (${response.status}).`);
-    return { httpMetadata: { contentType: response.headers.get("content-type") || undefined } };
+    const client = getStorageClient();
+    if (!client) throw new Error("Supabase Storage is not configured.");
+    const { data, error } = await client.storage
+      .from(storageBucketName())
+      .exists(key);
+    if (error) {
+      if (error.status === 404 || error.statusCode === "404") return null;
+      throw storageError("check", error);
+    }
+    return data ? {} : null;
   },
   async get(key: string) {
-    const response = await supabaseStorageRequest(
-      `/object/authenticated/${encodeURIComponent(storageBucketName())}/${encodeURIComponent(key)}`,
-    );
-    if (response.status === 404) return null;
-    if (!response.ok)
-      throw new Error(`Supabase Storage download failed (${response.status}).`);
-    return response.body
-      ? {
-          body: response.body,
-          httpMetadata: { contentType: response.headers.get("content-type") || undefined },
-        }
-      : null;
+    const client = getStorageClient();
+    if (!client) throw new Error("Supabase Storage is not configured.");
+    const { data, error } = await client.storage
+      .from(storageBucketName())
+      .download(key);
+    if (error) {
+      if (error.status === 404 || error.statusCode === "404") return null;
+      throw storageError("download", error);
+    }
+    return {
+      body: data.stream(),
+      httpMetadata: { contentType: data.type || undefined },
+    };
   },
 };
 
@@ -207,45 +237,25 @@ function storageBucketName() {
   return process.env.SUPABASE_STORAGE_BUCKET || "sko-designs-media";
 }
 
-async function supabaseStorageRequest(path: string, init: RequestInit = {}) {
-  const config = supabaseStorageConfig();
-  if (!config) throw new Error("Supabase Storage is not configured.");
-  const headers = new Headers(init.headers);
-  headers.set("apikey", config.key);
-  return fetch(`${config.url}/storage/v1${path}`, {
-    ...init,
-    headers,
-    cache: "no-store",
-    signal: AbortSignal.timeout(15_000),
-  });
-}
-
-let bucketSetup: Promise<void> | undefined;
 async function ensureSupabaseBucket() {
   if (!bucketSetup) {
     bucketSetup = (async () => {
       const name = storageBucketName();
       if (!/^[a-z0-9][a-z0-9-]{1,62}$/.test(name))
         throw new Error("SUPABASE_STORAGE_BUCKET has an invalid name.");
-      const existing = await supabaseStorageRequest(
-        `/bucket/${encodeURIComponent(name)}`,
-      );
-      if (existing.ok) return;
-      if (existing.status !== 404)
-        throw new Error(`Supabase Storage bucket check failed (${existing.status}).`);
-      const created = await supabaseStorageRequest("/bucket", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: name,
-          name,
-          public: false,
-          file_size_limit: 8_000_000,
-          allowed_mime_types: ["image/png", "image/jpeg", "image/webp"],
-        }),
+      const client = getStorageClient();
+      if (!client) throw new Error("Supabase Storage is not configured.");
+      const existing = await client.storage.getBucket(name);
+      if (!existing.error) return;
+      if (existing.error.status !== 404)
+        throw storageError("bucket check", existing.error);
+      const created = await client.storage.createBucket(name, {
+        public: false,
+        fileSizeLimit: 8_000_000,
+        allowedMimeTypes: ["image/png", "image/jpeg", "image/webp"],
       });
-      if (!created.ok && created.status !== 409)
-        throw new Error(`Supabase Storage bucket creation failed (${created.status}).`);
+      if (created.error && created.error.status !== 409)
+        throw storageError("bucket creation", created.error);
     })().catch((error) => {
       bucketSetup = undefined;
       throw error;
