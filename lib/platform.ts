@@ -152,6 +152,29 @@ function getStorageClient() {
         autoRefreshToken: false,
         detectSessionInUrl: false,
       },
+      global: {
+        fetch: (input, init) => {
+          const headers = new Headers(
+            input instanceof Request ? input.headers : undefined,
+          );
+          new Headers(init?.headers).forEach((value, name) =>
+            headers.set(name, value),
+          );
+          // Supabase's new API keys are not JWTs. Keep the SDK's apikey
+          // header, but remove its fallback Bearer header for sb_secret keys.
+          if (
+            config.key.startsWith("sb_secret_") &&
+            headers.get("authorization") === `Bearer ${config.key}`
+          )
+            headers.delete("authorization");
+          return fetch(input, {
+            ...init,
+            headers,
+            cache: "no-store",
+            signal: init?.signal ?? AbortSignal.timeout(15_000),
+          });
+        },
+      },
     });
   }
   return storageClient;
