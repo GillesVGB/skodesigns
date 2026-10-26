@@ -187,6 +187,16 @@ function storageError(operation: string, error: unknown) {
       : typeof error === "object" && error !== null && "statusCode" in error
         ? String(error.statusCode)
         : "unknown";
+  const details =
+    typeof error === "object" && error !== null
+      ? (error as { code?: unknown; message?: unknown })
+      : undefined;
+  const code = typeof details?.code === "string" ? details.code : undefined;
+  const message =
+    typeof details?.message === "string" ? details.message : "Unknown error";
+  // Keep the actionable Supabase response in server logs without exposing
+  // credentials or raw request headers to the browser.
+  console.error("[supabase-storage]", { operation, status, code, message });
   return new Error(`Supabase Storage ${operation} failed (${status}).`);
 }
 

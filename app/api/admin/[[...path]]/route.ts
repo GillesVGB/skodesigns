@@ -233,6 +233,11 @@ export async function POST(request: Request) {
     } else return json({ error: "notFound" }, 404);
     return json({ id }, 201);
   } catch (error) {
+    if (operation === "upload")
+      console.error(
+        "[admin-upload] request failed",
+        error instanceof Error ? error.message : "Unknown error",
+      );
     const invalid =
       error instanceof Error &&
       ["tooLarge", "invalidImage"].includes(error.message);
