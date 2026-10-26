@@ -3,6 +3,11 @@ import { projects } from "@/lib/content";
 import { readCatalog, readPricing } from "@/lib/catalog-server";
 import { boundedBytes, imageInfo } from "@/lib/image-upload";
 import {
+  revalidatePublicCatalog,
+  revalidatePublicPricing,
+  revalidatePublicReviews,
+} from "@/lib/public-cache";
+import {
   configured,
   cookie,
   hashToken,
@@ -125,6 +130,8 @@ export async function POST(request: Request) {
           .bind(id)
           .run();
       else return json({ error: "invalid" }, 400);
+      if (data.collection === "portfolio") revalidatePublicCatalog();
+      else revalidatePublicPricing();
       return new Response(null, {
         status: 204,
         headers: { "Cache-Control": "no-store" },
@@ -231,6 +238,8 @@ export async function POST(request: Request) {
         )
         .run();
     } else return json({ error: "notFound" }, 404);
+    if (operation === "portfolio") revalidatePublicCatalog();
+    else revalidatePublicPricing();
     return json({ id }, 201);
   } catch (error) {
     if (operation === "upload")
@@ -304,6 +313,9 @@ export async function DELETE(request: Request) {
     } else if (operation === "reviews")
       await env.DB!.prepare("DELETE FROM reviews WHERE id = ?").bind(id).run();
     else return json({ error: "notFound" }, 404);
+    if (operation === "portfolio") revalidatePublicCatalog();
+    else if (operation === "store") revalidatePublicPricing();
+    else revalidatePublicReviews();
     return new Response(null, {
       status: 204,
       headers: { "Cache-Control": "no-store" },

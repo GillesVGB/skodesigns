@@ -18,15 +18,15 @@ Open `http://127.0.0.1:5174`. Build with `npm run build`.
 - `lib/content.ts`: Dutch, English and French dictionaries, prices in euro cents, project catalogue and verified Discord invite. English is the first-visit default; language selections persist between visits.
 - `components/studio.tsx`: navigation, language switcher, gallery/lightbox, services, team, reviews, pricing calculator, contact and footer.
 - `app/globals.css`: shared design tokens, responsive layouts, reduced-motion styles and interaction states.
-- `app/[lang]/[[...slug]]/page.tsx`: nine public pages plus a protected staff page per language, translated metadata, canonical URLs and hreflang. Admin routes are excluded from the sitemap and marked noindex.
-- `proxy.ts`: server-rendered document language and redirects for existing unprefixed links.
+- `app/[lang]/[[...slug]]/page.tsx`: the public pages are statically rendered and revalidated hourly, with translated metadata, canonical URLs and hreflang. The separately routed staff page stays dynamic and is excluded from indexing.
+- `proxy.ts`: redirects only existing unprefixed links; localized document language is set by the matching root layout.
 - `public/assets`: the supplied Sko branding, nine recent works, optimized static animation previews, Gilles' Discord avatar and a self-hosted Manrope variable font.
 - `components/project-planner.tsx` and `lib/planner-copy.ts`: a local three-step project brief builder with validated fields, clipboard copy and text-file download in all languages.
 - `components/public-reviews.tsx` and `app/api/reviews/route.ts`: real review submission with a public-consent checkbox, server validation and Postgres persistence.
 - `components/admin.tsx`: Discord staff login and management of recent work, the existing pricing page and reviews. There is no separate store page: pricing is the store.
 - `lib/pricing-catalog.ts`: the original price list; database overrides and new items feed the pricing page, package calculator and project planner together.
 - `lib/staff-auth.ts`: authorization-code OAuth with state validation, encrypted access tokens, opaque HttpOnly session cookies and server-side membership checks. Sessions expire within one hour; positive role checks are reused for at most ten seconds to avoid Discord rate limits. Removing a staff role therefore takes effect within ten seconds. API failures deny access.
-- `lib/platform.ts`: Supabase Postgres persistence and private Supabase Storage for staff uploads. The first API request creates the required tables and indexes if the database is empty; the first upload creates the private `sko-designs-media` bucket if needed.
+- `lib/platform.ts`: Supabase Postgres persistence and private Supabase Storage for staff uploads. Database reads do not run schema changes; tables and indexes are managed by the committed Drizzle migrations. The first staff upload creates the private `sko-designs-media` bucket if needed.
 - Staff uploads have an 8 MB limit and validated PNG/JPEG/static WebP headers and bounded image dimensions. Deleting portfolio and price items unpublishes them, with an immediate Undo action. Deleting a review permanently removes that record after an explicit confirmation in the UI.
 
 ## Discord staff access

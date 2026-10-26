@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import ProjectPlanner from "./project-planner";
 import Admin from "./admin";
 import ManagedPricing from "./managed-pricing";
 import { basePricing, type PricingItem } from "@/lib/pricing-catalog";
 import PublicReviews from "./public-reviews";
+import type { PublicReview } from "@/lib/review-copy";
 import {
   ReferenceAbout,
   ReferenceServices,
@@ -91,22 +92,21 @@ function DiscordIcon() {
   );
 }
 function ThemeToggle({ d }: { d: Dictionary }) {
-  const [dark, setDark] = useState(false);
+  const dark = useSyncExternalStore(
+    subscribeTheme,
+    getThemeSnapshot,
+    getServerThemeSnapshot,
+  );
   useEffect(() => {
-    let saved = false;
-    try {
-      saved = localStorage.getItem("sko-theme") === "dark";
-    } catch {}
-    setDark(saved);
-    document.documentElement.dataset.theme = saved ? "dark" : "light";
-  }, []);
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+  }, [dark]);
   const toggle = () => {
     const next = !dark;
-    setDark(next);
     document.documentElement.dataset.theme = next ? "dark" : "light";
     try {
       localStorage.setItem("sko-theme", next ? "dark" : "light");
     } catch {}
+    window.dispatchEvent(new Event("sko-theme-change"));
   };
   return (
     <button
@@ -135,6 +135,35 @@ function ThemeToggle({ d }: { d: Dictionary }) {
       </svg>
     </button>
   );
+}
+
+function getThemeSnapshot() {
+  try {
+    return localStorage.getItem("sko-theme") === "dark";
+  } catch {
+    return false;
+  }
+}
+
+function getServerThemeSnapshot() {
+  return false;
+}
+
+function subscribeTheme(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener("sko-theme-change", onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener("sko-theme-change", onChange);
+  };
+}
+
+const getPortfolioFilterSnapshot = () =>
+  new URLSearchParams(window.location.search).get("category") || "all";
+const getServerPortfolioFilterSnapshot = () => "all";
+function subscribePortfolioFilter(onChange: () => void) {
+  window.addEventListener("popstate", onChange);
+  return () => window.removeEventListener("popstate", onChange);
 }
 
 function LanguageSelector({
@@ -551,33 +580,33 @@ function Portfolio({
   full?: boolean;
   catalog?: Project[];
 }) {
-  const [filter, setFilter] = useState("all");
+  const [localFilter, setLocalFilter] = useState("all");
+  const requestedFilter = useSyncExternalStore(
+    subscribePortfolioFilter,
+    getPortfolioFilterSnapshot,
+    getServerPortfolioFilterSnapshot,
+  );
+  const filter = full
+    ? requestedFilter in d.work.filters
+      ? requestedFilter
+      : "all"
+    : localFilter;
   const [selected, setSelected] = useState<Project | null>(null);
   const [playing, setPlaying] = useState(false);
   const modal = useRef<HTMLDialogElement>(null);
   const lastTrigger = useRef<HTMLElement | null>(null);
-  useEffect(() => {
-    const f = new URLSearchParams(window.location.search).get("category");
-    if (f && f in d.work.filters) setFilter(f);
-    const pop = () => {
-      const v = new URLSearchParams(window.location.search).get("category");
-      setFilter(v && v in d.work.filters ? v : "all");
-    };
-    window.addEventListener("popstate", pop);
-    return () => window.removeEventListener("popstate", pop);
-  }, [d]);
   const items = full ? catalog : catalog.filter((p) => p.featured).slice(0, 6);
   const visible = items.filter(
     (p) => filter === "all" || p.category === filter,
   );
   const changeFilter = (f: string) => {
-    setFilter(f);
     if (full) {
       const u = new URL(window.location.href);
       if (f === "all") u.searchParams.delete("category");
       else u.searchParams.set("category", f);
       window.history.pushState({}, "", u);
-    }
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    } else setLocalFilter(f);
   };
   const openProject = (p: Project, e: React.MouseEvent<HTMLButtonElement>) => {
     lastTrigger.current = e.currentTarget;
@@ -985,12 +1014,23 @@ function About({
 function Reviews({
   lang,
   full = false,
+  reviews,
+  available,
 }: {
   lang: Language;
   d: Dictionary;
   full?: boolean;
+  reviews?: PublicReview[];
+  available?: boolean;
 }) {
-  return <PublicReviews lang={lang} full={full} />;
+  return (
+    <PublicReviews
+      lang={lang}
+      full={full}
+      initialReviews={reviews}
+      available={available}
+    />
+  );
 }
 
 function Contact({ lang, d }: { lang: Language; d: Dictionary }) {
@@ -1162,11 +1202,15 @@ export default function Studio({
   page,
   catalog = projects,
   pricing = basePricing(),
+  reviews,
+  reviewsAvailable,
 }: {
   lang: Language;
   page: Page;
   catalog?: Project[];
   pricing?: PricingItem[];
+  reviews?: PublicReview[];
+  reviewsAvailable?: boolean;
 }) {
   const d = dictionaries[lang];
   useEffect(() => {
@@ -1186,7 +1230,11 @@ export default function Studio({
             <Hero lang={lang} d={d} />
             <Portfolio lang={lang} d={d} catalog={catalog} />
             <ReferenceAbout lang={lang} d={d} />
-            <PublicReviews lang={lang} />
+            <PublicReviews
+              lang={lang}
+              initialReviews={reviews}
+              available={reviewsAvailable}
+            />
             <ReferenceServices lang={lang} d={d} />
             <ReferenceContact lang={lang} d={d} />
           </>
@@ -1241,7 +1289,13 @@ export default function Studio({
               title={d.reviews.title}
               accent={d.reviews.accent}
             />
-            <Reviews lang={lang} d={d} full />
+            <Reviews
+              lang={lang}
+              d={d}
+              full
+              reviews={reviews}
+              available={reviewsAvailable}
+            />
           </>
         )}
         {page === "contact" && (

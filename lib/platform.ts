@@ -8,20 +8,7 @@ type QueryRunner = (
   values: postgres.ParameterOrJSON<never>[],
 ) => Promise<QueryRows>;
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS reviews (id TEXT PRIMARY KEY, name TEXT NOT NULL, rating INTEGER NOT NULL, body TEXT NOT NULL, language TEXT NOT NULL, created_at DOUBLE PRECISION NOT NULL)`,
-  `CREATE TABLE IF NOT EXISTS review_limits (id TEXT PRIMARY KEY, next_allowed_at DOUBLE PRECISION NOT NULL)`,
-  `CREATE TABLE IF NOT EXISTS staff_sessions (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, name TEXT NOT NULL, avatar TEXT, token_cipher TEXT NOT NULL, expires_at DOUBLE PRECISION NOT NULL, verified_at DOUBLE PRECISION)`,
-  `CREATE TABLE IF NOT EXISTS portfolio_items (id TEXT PRIMARY KEY, title TEXT NOT NULL, category TEXT NOT NULL, image TEXT NOT NULL, width INTEGER NOT NULL, height INTEGER NOT NULL, featured INTEGER NOT NULL, created_at DOUBLE PRECISION NOT NULL, deleted_at DOUBLE PRECISION)`,
-  `CREATE TABLE IF NOT EXISTS hidden_projects (id TEXT PRIMARY KEY, created_at DOUBLE PRECISION NOT NULL)`,
-  `CREATE TABLE IF NOT EXISTS store_items (id TEXT PRIMARY KEY, title TEXT NOT NULL, description_nl TEXT NOT NULL, description_en TEXT NOT NULL, description_fr TEXT NOT NULL, price INTEGER NOT NULL, image TEXT, created_at DOUBLE PRECISION NOT NULL, deleted_at DOUBLE PRECISION, title_nl TEXT, title_en TEXT, title_fr TEXT, kind TEXT NOT NULL DEFAULT 'single', quantity INTEGER)`,
-  `CREATE INDEX IF NOT EXISTS reviews_created_at_idx ON reviews (created_at DESC)`,
-  `CREATE INDEX IF NOT EXISTS portfolio_live_idx ON portfolio_items (deleted_at, created_at DESC)`,
-  `CREATE INDEX IF NOT EXISTS store_live_idx ON store_items (deleted_at, created_at)`,
-];
-
 let client: ReturnType<typeof postgres> | undefined;
-let schemaReady: Promise<void> | undefined;
 
 function getClient() {
   const url = process.env.SUPABASE_DATABASE_URL;
@@ -36,24 +23,6 @@ function getClient() {
     });
   }
   return client;
-}
-
-async function ensureSchema(db: ReturnType<typeof postgres>) {
-  if (!schemaReady) {
-    schemaReady = db.begin(async (tx) => {
-      for (const statement of schema) await tx.unsafe(statement);
-      await tx.unsafe(
-        "ALTER TABLE staff_sessions ADD COLUMN IF NOT EXISTS verified_at DOUBLE PRECISION",
-      );
-      await tx.unsafe(
-        "ALTER TABLE store_items ADD COLUMN IF NOT EXISTS title_nl TEXT, ADD COLUMN IF NOT EXISTS title_en TEXT, ADD COLUMN IF NOT EXISTS title_fr TEXT, ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'single', ADD COLUMN IF NOT EXISTS quantity INTEGER",
-      );
-    }).then(() => undefined).catch((error) => {
-      schemaReady = undefined;
-      throw error;
-    });
-  }
-  await schemaReady;
 }
 
 function toPostgres(statement: string) {
@@ -111,7 +80,6 @@ async function runQuery(
     throw new Error(
       "SUPABASE_DATABASE_URL is not configured.",
     );
-  await ensureSchema(db);
   return statement.execute(run);
 }
 
@@ -125,7 +93,6 @@ const database = {
       throw new Error(
         "SUPABASE_DATABASE_URL is not configured.",
       );
-    await ensureSchema(db);
     return db.begin(async (tx) => {
       const results = [];
       for (const statement of statements) {

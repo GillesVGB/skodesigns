@@ -1,5 +1,6 @@
 import { env } from "@/lib/platform";
-import {publicOrigin} from "@/lib/staff-auth";
+import { publicOrigin } from "@/lib/staff-auth";
+import { revalidatePublicReviews } from "@/lib/public-cache";
 
 export const dynamic = "force-dynamic";
 const headers = {
@@ -18,7 +19,9 @@ export async function GET() {
     const result = await env.DB.prepare(
       "SELECT id, name, rating, body, language, created_at AS createdAt FROM reviews ORDER BY created_at DESC, id DESC LIMIT 50",
     ).all();
-    return reply({ reviews: result.results });
+    return reply({ reviews: result.results }, 200, {
+      "Cache-Control": "public, max-age=0, s-maxage=300, stale-while-revalidate=60",
+    });
   } catch {
     return reply({ error: "unavailable" }, 503);
   }
@@ -124,6 +127,7 @@ export async function POST(request: Request) {
         "DELETE FROM review_limits WHERE next_allowed_at < ?",
       ).bind(now - 86_400_000),
     ]);
+    revalidatePublicReviews();
     return reply({ review }, 201);
   } catch {
     return reply({ error: "unavailable" }, 503);

@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Studio from "@/components/studio";
-import { readCatalog, readPricing } from "@/lib/catalog-server";
+import {
+  readCatalog,
+  readPricing,
+  readPublicReviews,
+} from "@/lib/catalog-server";
 import {
   canonicalOrigin,
   dictionaries,
@@ -13,12 +17,24 @@ import {
 } from "@/lib/content";
 
 type Props = { params: Promise<{ lang: string; slug?: string[] }> };
+export const revalidate = 3600;
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return [
+    { slug: [] },
+    ...pages
+      .filter((page) => page !== "home" && page !== "admin")
+      .map((slug) => ({ slug: [slug] })),
+  ];
+}
+
 async function resolve(params: Props["params"]) {
   const { lang, slug = [] } = await params;
   if (
     !languages.includes(lang as Language) ||
     slug.length > 1 ||
-    (slug[0] && !pages.includes(slug[0] as Page))
+    (slug[0] && (!pages.includes(slug[0] as Page) || slug[0] === "admin"))
   )
     notFound();
   return { lang: lang as Language, page: (slug[0] || "home") as Page };
@@ -74,5 +90,18 @@ export default async function Page({ params }: Props) {
     page === "home" || page === "portfolio" ? await readCatalog() : undefined;
   const pricing =
     page === "pricing" || page === "planner" ? await readPricing() : undefined;
-  return <Studio lang={lang} page={page} catalog={catalog} pricing={pricing} />;
+  const reviewSnapshot =
+    page === "home" || page === "reviews"
+      ? await readPublicReviews()
+      : undefined;
+  return (
+    <Studio
+      lang={lang}
+      page={page}
+      catalog={catalog}
+      pricing={pricing}
+      reviews={reviewSnapshot?.reviews}
+      reviewsAvailable={reviewSnapshot?.available}
+    />
+  );
 }

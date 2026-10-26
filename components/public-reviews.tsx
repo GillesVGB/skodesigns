@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 import { route, type Language } from "@/lib/content";
 import { reviewCopy, type PublicReview } from "@/lib/review-copy";
 import "@/app/public-reviews.css";
@@ -12,17 +12,22 @@ type FieldErrors = Partial<
 export default function PublicReviews({
   lang,
   full = false,
+  initialReviews = [],
+  available = true,
 }: {
   lang: Language;
   full?: boolean;
+  initialReviews?: PublicReview[];
+  available?: boolean;
 }) {
   const t = reviewCopy[lang];
   const id = useId();
   const modal = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
-  const [reviews, setReviews] = useState<PublicReview[]>([]);
-  const [load, setLoad] = useState<"loading" | "ready" | "error">("loading");
-  const [attempt, setAttempt] = useState(0);
+  const [reviews, setReviews] = useState<PublicReview[]>(initialReviews);
+  const [load, setLoad] = useState<"loading" | "ready" | "error">(
+    available ? "ready" : "error",
+  );
   const [name, setName] = useState("");
   const [rating, setRating] = useState(0);
   const [body, setBody] = useState("");
@@ -34,22 +39,19 @@ export default function PublicReviews({
   const nameInput = useRef<HTMLInputElement>(null);
   const bodyInput = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    const controller = new AbortController();
+  async function retryLoad() {
     setLoad("loading");
-    fetch("/api/reviews/", { cache: "no-store", signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("unavailable");
-        const data = (await response.json()) as { reviews?: PublicReview[] };
-        if (!Array.isArray(data.reviews)) throw new Error("invalid");
-        setReviews(data.reviews);
-        setLoad("ready");
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setLoad("error");
-      });
-    return () => controller.abort();
-  }, [attempt]);
+    try {
+      const response = await fetch("/api/reviews/");
+      if (!response.ok) throw new Error("unavailable");
+      const data = (await response.json()) as { reviews?: PublicReview[] };
+      if (!Array.isArray(data.reviews)) throw new Error("invalid");
+      setReviews(data.reviews);
+      setLoad("ready");
+    } catch {
+      setLoad("error");
+    }
+  }
 
   function close() {
     modal.current?.close();
@@ -175,7 +177,7 @@ export default function PublicReviews({
             <p>{t.loadError}</p>
             <button
               className="text-link"
-              onClick={() => setAttempt((value) => value + 1)}
+              onClick={() => void retryLoad()}
             >
               {t.retry} ↻
             </button>

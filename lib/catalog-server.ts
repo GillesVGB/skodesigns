@@ -1,6 +1,7 @@
 import { env } from "./platform";
 import { projects, type Project } from "@/lib/content";
 import { basePricing, type PricingItem } from "@/lib/pricing-catalog";
+import type { PublicReview } from "@/lib/review-copy";
 export async function readCatalog(): Promise<Project[]> {
   if (!env.DB) return projects;
   const [hidden, added] = await env.DB.batch([
@@ -38,4 +39,15 @@ export async function readPricing(): Promise<PricingItem[]> {
       (row) => row.deleted_at === null && !baseIds.has(row.id),
     ),
   ];
+}
+
+export async function readPublicReviews(): Promise<{
+  reviews: PublicReview[];
+  available: boolean;
+}> {
+  if (!env.DB) return { reviews: [], available: false };
+  const result = await env.DB.prepare(
+    'SELECT id, name, rating, body, language, created_at AS "createdAt" FROM reviews ORDER BY created_at DESC, id DESC LIMIT 50',
+  ).all<PublicReview>();
+  return { reviews: result.results, available: true };
 }

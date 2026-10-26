@@ -20,19 +20,18 @@ export function proxy(request: NextRequest) {
     url.pathname = `/${lang}${path}`;
     return NextResponse.redirect(url);
   }
-  const headers = new Headers(request.headers);
-  const language = request.nextUrl.pathname.split("/")[1];
-  headers.set(
-    "x-sko-language",
-    ["nl", "en", "fr"].includes(language) ? language : "en",
-  );
-  const response = NextResponse.next({ request: { headers } });
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  if (path.includes("/admin") || path.startsWith("/api/auth"))
-    response.headers.set("Cache-Control", "no-store");
-  return response;
+  return NextResponse.next();
 }
 export const config = {
-  matcher: ["/((?!_next|assets|favicon|robots|sitemap).*)"],
+  matcher: [
+    "/portfolio/:path*",
+    "/pricing/:path*",
+    "/services/:path*",
+    "/about/:path*",
+    "/reviews/:path*",
+    "/contact/:path*",
+    "/planner/:path*",
+    "/store/:path*",
+    "/admin/:path*",
+  ],
 };
