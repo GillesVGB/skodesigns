@@ -280,7 +280,10 @@ async function ensureSupabaseBucket() {
       if (!client) throw new Error("Supabase Storage is not configured.");
       const existing = await client.storage.getBucket(name);
       if (!existing.error) return;
-      if (existing.error.status !== 404)
+      const missingBucket =
+        existing.error.status === 404 ||
+        ("code" in existing.error && existing.error.code === "NoSuchBucket");
+      if (!missingBucket)
         throw storageError("bucket check", existing.error);
       const created = await client.storage.createBucket(name, {
         public: false,
